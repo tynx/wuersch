@@ -1,0 +1,8 @@
+<?php
+
+class Config{
+	public static $BASE_LOCATION = '/wuersch/';
+	public static $ERROR_LOCATION = 'site/error';
+}
+
+?>
