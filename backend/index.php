@@ -4,7 +4,7 @@ session_start();
 
 include('include.php');
 
-$baseLocation = '/wuersch/';
+$baseLocation = '/wuersch/backend/';
 
 $request = new Request();
 if(!$request->isValid())
@@ -21,6 +21,12 @@ if (!is_subclass_of($controller, 'BaseController'))
 if (!method_exists($controller, $actionName))
 	die("Invalid action");
 
+if($controller->actionRequiresAuth($actionName) && !$request->hasHeaderField('hmac')){
+	die("Auth required!");
+}
+
+$controller->setRequest($request);
+
 $arguments = array();
 $rm = new ReflectionMethod($controllerName, $actionName);
 
@@ -33,5 +39,10 @@ foreach ($params as $i => $param){
 }
 
 call_user_func_array(array($controller, $actionName), $arguments);
+
+$response = $controller->getResponse();
+
+header('Content-Type: ' . $response->getContentType());
+echo $response->getBody();
 
 ?>
