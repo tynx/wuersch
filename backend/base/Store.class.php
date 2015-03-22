@@ -31,6 +31,21 @@ class Store{
 		return $value;
 	}
 
+	public function getById($table, $id){
+		$query = 'SELECT * FROM `wuersch`.`' . $table . '` WHERE ';
+		if(!is_numeric($id) && strlen($id)==32){
+			$query .= '`id_md5`="' . $id . '"';
+		}else{
+			$query .= '`id`=' . $id;
+		}
+		$sth = Store::$pdo->prepare($query . ';');
+		$sth->execute();
+		$result = $sth->fetchAll(PDO::FETCH_ASSOC);
+		if(count($result) === 1)
+			return $result[0];
+		return null;
+	}
+
 	public function insert($table, $data){
 		if(!is_array($data))
 			return -1;

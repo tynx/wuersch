@@ -21,9 +21,12 @@ if (!is_subclass_of($controller, 'BaseController'))
 if (!method_exists($controller, $actionName))
 	die("Invalid action");
 
-if($controller->actionRequiresAuth($actionName) && !$request->hasHeaderField('hmac')){
+if($controller->actionRequiresAuth($actionName) && !$request->isAuthenticated()){
 	die("Auth required!");
 }
+
+if($request->getAuthenticatedUser() !== null)
+	$controller->setUser($request->getAuthenticatedUser());
 
 $controller->setRequest($request);
 

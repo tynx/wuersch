@@ -1,19 +1,5 @@
 <?php
 
-include('vendor/vendorsAutoload.php');
-require_once('base/Config.class.php');
-require_once('base/Request.class.php');
-require_once('base/Response.class.php');
-require_once('base/JSONResponse.class.php');
-require_once('base/Store.class.php');
-require_once('base/HMAC.class.php');
-require_once('domain/User.class.php');
-require_once('controller/BaseController.class.php');
-require_once('controller/SiteController.class.php');
-require_once('controller/AuthController.class.php');
-require_once('controller/UserController.class.php');
-
-
 function sha1_hmac($key,$data,$blockSize=64,$opad=0x5c,$ipad=0x36) {
 	// Keys longer than blocksize are shortened
 	if (strlen($key) > $blockSize) {
@@ -29,5 +15,6 @@ function sha1_hmac($key,$data,$blockSize=64,$opad=0x5c,$ipad=0x36) {
 	return sha1($o_key_pad.sha1($i_key_pad.$data,true));
 }
 
+include('Curl.php');
 
 ?>

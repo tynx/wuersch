@@ -2,26 +2,69 @@
 
 class Request{
 
-	private $method = null;
 	private $valid = false;
+	private $authenticated = false;
+	private $method = null;
+	private $path = null;
 	private $controller = 'site';
 	private $action = 'index';
 	private $headers = array();
 	private $arguments = array();
 	private $post = null;
+	private $user = null;
 
 	public function __construct(){
 		$this->parse();
+		$this->authenticate();
 	}
 
 	public function isValid(){
-		if(!$this->valid)
-			return false;
-		if($this->hasHeaderField('hmac')){
-			if(!$this->hasHeaderField('date'))
-				return false;
+		return $this->valid;
+	}
+
+	public function isAuthenticated(){
+		return $this->authenticated;
+	}
+
+	public function getAuthenticatedUser(){
+		if($this->authenticated)
+			return $this->user;
+		return null;
+	}
+
+	private function authenticate(){
+		if(!$this->hasHeaderField('hmac'))
+			return;
+		if(!$this->hasHeaderField('timestamp'))
+			return;
+		if((int)$this->getHeaderField('timestamp') + Config::$AUTH_TIME_THRESHOLD < time())
+			return;
+		$parts = explode(':', $this->getHeaderField('hmac'));
+		if(count($parts) !== 2){
+			return;
 		}
-		return true;
+		$store = new Store();
+		$user = $store->getById('user', $parts[0]);
+		if($user === null)
+			return;
+		$toHash = $this->getHeaderField('timestamp') . "\n";
+		$toHash .= $this->getMethod() . "\n";
+		$toHash .= $this->path . "\n";
+		if($this->getMethod() === 'get')
+			$toHash .= "\n";
+		elseif($this->getMethod() === 'post')
+			$toHash .= md5($this->post) . "\n";
+		echo '>' . $toHash . '<';
+		$calcedHash = sha1_hmac($user['secret'], $toHash);
+		if($calcedHash === $parts[1]){
+			$this->authenticated = true;
+			$this->user = new User($user);
+			$columns = array(
+				'last_seen' => time(),
+				'last_ip' => $_SERVER['REMOTE_ADDR'],
+			);
+			$store->update('user', $this->user->id, $columns);
+		}
 	}
 
 	public function getMethod(){
@@ -61,8 +104,8 @@ class Request{
 
 	private function parse(){
 		$this->method = strtolower($_SERVER['REQUEST_METHOD']);
-		$unparsed = str_replace(Config::$BASE_LOCATION, '', $_SERVER['REQUEST_URI']);
-		$request = explode('?', strtolower($unparsed))[0];
+		$this->path = str_replace(Config::$BASE_LOCATION, '', $_SERVER['REQUEST_URI']);
+		$request = explode('?', strtolower($this->path))[0];
 		if(!empty($request))
 			$parts = explode('/', $request);
 		else

@@ -8,12 +8,16 @@ CREATE TABLE `wuersch`.`user`(
   `secret` VARCHAR(1024) NULL,
   `name` VARCHAR(2048) NULL,
   `fb_id` BIGINT NULL,
-  `isMale` TINYINT(1) NOT NULL DEFAULT 0,
-  `isFemale` TINYINT(1) NOT NULL DEFAULT 0,
-  `authenticated` TINYINT(1) NOT NULL DEFAULT 0,
-  `registered` BIGINT NULL,
+  `fb_access_token` VARCHAR(1024) NULL,
+  `is_male` TINYINT(1) NOT NULL DEFAULT 0,
+  `is_female` TINYINT(1) NOT NULL DEFAULT 0,
+  `interested_in_male` TINYINT(1) NOT NULL DEFAULT 0,
+  `interested_in_female` TINYINT(1) NOT NULL DEFAULT 0,
+  `setup_time` TINYINT(1) NOT NULL DEFAULT 0,
+  `register_time` BIGINT NOT NULL DEFAULT 0,
+  `authenticated_time` BIGINT NOT NULL DEFAULT 0,
   `last_seen` BIGINT NULL,
-  `last_ip` BIGINT NULL
+  `last_ip` VARCHAR(45) NULL
 ) ENGINE = InnoDB
   DEFAULT CHARACTER SET UTF8
   COLLATE utf8_general_ci;
@@ -27,3 +31,12 @@ CREATE TABLE `wuersch`.`would`(
   DEFAULT CHARACTER SET UTF8
   COLLATE utf8_general_ci;
 
+CREATE TABLE `wuersch`.`picture`(
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_md5` VARCHAR(32) NULL,
+  `id_user` INT NOT NULL,
+  `fb_id` BIGINT NULL,
+  `front` TINYINT(1) DEFAULT 0 NOT NULL
+) ENGINE = InnoDB
+  DEFAULT CHARACTER SET UTF8
+  COLLATE utf8_general_ci;

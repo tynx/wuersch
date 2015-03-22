@@ -5,6 +5,7 @@ abstract class BaseController{
 	protected $postData = array();
 	protected $request = null;
 	protected $response = null;
+	protected $user = null;
 
 	public abstract function actionRequiresAuth($name);
 
@@ -13,6 +14,10 @@ abstract class BaseController{
 			$this->postData = json_decode($request->getPostData(), true);
 		}
 		$this->request = $request;
+	}
+
+	public final function setUser($user){
+		$this->user = $user;
 	}
 
 	protected final function setResponse($response){
