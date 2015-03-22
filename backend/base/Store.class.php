@@ -40,10 +40,27 @@ class Store{
 		}
 		$sth = Store::$pdo->prepare($query . ';');
 		$sth->execute();
-		$result = $sth->fetchAll(PDO::FETCH_ASSOC);
-		if(count($result) === 1)
+		$result = $sth->fetchAll(PDO::FETCH_CLASS, ucfirst($table));
+		if(count($result) === 1){
 			return $result[0];
+		}
 		return null;
+	}
+
+	public function getByColumns($table, $columns, $combination = 'AND'){
+		$query = 'SELECT * FROM `wuersch`.`' . $table . '` WHERE ';
+		foreach($columns as $key=>$value){
+			$query .= '`' . $key . '`=';
+			if(is_numeric($value))
+				$query .= $value;
+			else
+				$query .= '"' . $value . '"';
+			$query .= ' AND ';
+		}
+		$query = substr($query, 0, -5);
+		$sth = Store::$pdo->prepare($query . ';');
+		$sth->execute();
+		return $sth->fetchAll(PDO::FETCH_CLASS, ucfirst($table));
 	}
 
 	public function insert($table, $data){

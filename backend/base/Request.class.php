@@ -50,15 +50,14 @@ class Request{
 		$toHash = $this->getHeaderField('timestamp') . "\n";
 		$toHash .= $this->getMethod() . "\n";
 		$toHash .= $this->path . "\n";
-		if($this->getMethod() === 'get')
-			$toHash .= "\n";
-		elseif($this->getMethod() === 'post')
+		//if($this->getMethod() === 'get')
+			//$toHash .= "\n";
+		//elseif($this->getMethod() === 'post')
 			$toHash .= md5($this->post) . "\n";
-		echo '>' . $toHash . '<';
-		$calcedHash = sha1_hmac($user['secret'], $toHash);
+		$calcedHash = sha1_hmac($user->secret, $toHash);
 		if($calcedHash === $parts[1]){
 			$this->authenticated = true;
-			$this->user = new User($user);
+			$this->user = $user;
 			$columns = array(
 				'last_seen' => time(),
 				'last_ip' => $_SERVER['REMOTE_ADDR'],

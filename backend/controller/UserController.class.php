@@ -8,10 +8,15 @@ class UserController extends BaseController{
 
 	public function actionCurrent(){
 		$store = new Store();
-		$user = $store->getById('user', $this->user->id);
 		$response = new JSONResponse();
-		foreach($user as $key => $value)
-			$response->put($key, $value);
+		//foreach($user as $key => $value)
+		//	$response->put($key, $value);
+		$response->put('user', $this->user);
+		$pictures = $store->getByColumns('picture', array('id_user'=>$this->user->id));
+		foreach($pictures as $picture){
+			//$picture[]
+		}
+		$response->put('pictures', $pictures);
 		$this->response = $response;
 	}
 

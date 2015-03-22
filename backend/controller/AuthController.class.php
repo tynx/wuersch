@@ -97,8 +97,8 @@ class AuthController extends BaseController{
 
 
 	public function actionSetup(){
-		if($this->user->setupTime > 0)
-			die('already setup\'d!');
+		//if($this->user->setupTime > 0)
+			//die('already setup\'d!');
 		$store = new Store();
 		$session = new FacebookSession($this->user->fbAccessToken);
 		$graph = (new FacebookRequest($session, 'GET', '/me/photos/uploaded'))->execute()->getGraphObject(GraphUser::className());
@@ -111,11 +111,11 @@ class AuthController extends BaseController{
 				'fb_id' => $pic->id,
 				'front' => false,
 			);
-			if($i == 0)
+			if($i == 0) // actual detection
 				$img['front'] = true;
 			$id = $store->insert('picture', $img);
 			$store->update('picture', $id, array('id_md5'=>md5($id)));
-			$curl->download($pic->source, Config::$USER_PICTURES . md5($id) . '.jpg');
+			$curl->download($pic->source, WEBROOT . Config::$USER_PICTURES . md5($id) . '.jpg');
 		}
 		$columns = array(
 			'setup_time' => time(),

@@ -2,6 +2,7 @@
 
 session_start();
 
+define('WEBROOT', __DIR__);
 include('include.php');
 
 $baseLocation = '/wuersch/backend/';
