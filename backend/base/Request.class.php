@@ -50,10 +50,7 @@ class Request{
 		$toHash = $this->getHeaderField('timestamp') . "\n";
 		$toHash .= $this->getMethod() . "\n";
 		$toHash .= $this->path . "\n";
-		//if($this->getMethod() === 'get')
-			//$toHash .= "\n";
-		//elseif($this->getMethod() === 'post')
-			$toHash .= md5($this->post) . "\n";
+		$toHash .= md5($this->post) . "\n";
 		$calcedHash = sha1_hmac($user->secret, $toHash);
 		if($calcedHash === $parts[1]){
 			$this->authenticated = true;

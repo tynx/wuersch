@@ -7,6 +7,10 @@ abstract class BaseController{
 	protected $response = null;
 	protected $user = null;
 
+	public final function __construct(){
+		$this->response = new Response();
+	}
+
 	public abstract function actionRequiresAuth($name);
 
 	public final function setRequest($request){
@@ -20,14 +24,12 @@ abstract class BaseController{
 		$this->user = $user;
 	}
 
-	protected final function setResponse($response){
-		$this->response = $response;
+	public final function getResponse(){
+		return $this->response;
 	}
 
-	public final function getResponse(){
-		if($this->response === null)
-			return new Response();
-		return $this->response;
+	protected final function error($errorMessage){
+		$this->response->markAsError('user was not found!');
 	}
 }
 

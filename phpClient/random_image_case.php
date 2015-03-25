@@ -14,19 +14,18 @@ $curl->setHeader('hmac', $hmac);
 $curl->setHeader('timestamp', $time);
 
 $curl->get('http://localhost/wuersch/backend/user/random');
-
 $randomUser = $curl->response->randomUser;
 
 //var_dump($curl->response);
 $time = time();
-$toHash = $time . "\n" . 'get' . "\n" . 'picture?userId=' . $randomUser->id . "\n" . md5(null) . "\n";
+$toHash = $time . "\n" . 'get' . "\n" . 'picture?idUser=' . $randomUser->id . "\n" . md5(null) . "\n";
 $hmac = $id . ':' . sha1_hmac($secret, $toHash);
 
 $curl = new Curl();
 $curl->setHeader('hmac', $hmac);
 $curl->setHeader('timestamp', $time);
 
-$curl->get('http://localhost/wuersch/backend/picture?userId=' . $randomUser->id);
+$curl->get('http://localhost/wuersch/backend/picture?idUser=' . $randomUser->id);
 echo $curl->response;
 
 ?>

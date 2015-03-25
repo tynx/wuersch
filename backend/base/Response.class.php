@@ -1,23 +1,37 @@
 <?php
 
 class Response{
-	private $body = null;
-	private $contentType = 'text/html';
-	
-	public function getBody(){
-		return $this->body;
+	private $responses = array();
+	private $status = null;
+	private $statusMessage = null;
+	private $contentType = null;
+
+	public function __construct($contentType = 'application/json'){
+		$this->status = 'OK';
+		$this->statusMessage = 'All good.';
+		$this->contentType = $contentType;
 	}
 
 	public function getContentType(){
 		return $this->contentType;
 	}
 
-	public function setBody($body){
-		$this->body = $body;
+	public function getBody(){
+		$arr = array(
+			'status'=>$this->status,
+			'statusMessage'=>$this->statusMessage,
+			'responses'=>$this->responses,
+		);
+		return json_encode($arr);
 	}
 
-	public function setContentType($contentType){
-		$this->contentType = $contentType;
+	public function addResponse($response){
+		$this->responses[] = $response;
+	}
+
+	public function markAsError($errorMessage = 'An error occured!'){
+		$this->status = 'FAIL';
+		$this->statusMessage = $errorMessage;
 	}
 }
 

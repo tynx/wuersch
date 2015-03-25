@@ -8,7 +8,7 @@ class PictureController extends BaseController{
 
 	public function actionIndex($idUser){
 		$store = new Store();
-		$user = $store->getById('user', $iduser);
+		$user = $store->getById('user', $idUser);
 		$columns = array(
 			'id_user'=>$user->id,
 			'default'=>1,
@@ -19,6 +19,18 @@ class PictureController extends BaseController{
 		header('Content-type: image/jpeg');
 		readfile(WEBROOT . Config::$USER_PICTURES . $picture[0]->id_md5 . '.jpg');
 		exit(0);
+	}
+
+	public function actionGet(){
+		$store = new Store();
+		$columns = array('id_user'=>$this->user->id);
+		$pictures = $store->getByColumns('picture', $columns);
+		foreach($pictures as $picture){
+			$this->response->addResponse(array(
+				'type'=>'picture',
+				'data'=>$picture->getPublicData(),
+			));
+		}
 	}
 }
 
