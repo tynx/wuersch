@@ -8,16 +8,17 @@ class UserController extends BaseController{
 
 	public function actionCurrent(){
 		$store = new Store();
-		$response = new JSONResponse();
-		//foreach($user as $key => $value)
-		//	$response->put($key, $value);
-		$response->put('user', $this->user);
+		$this->response->addResponse(array('type'=>'user', 'data'=>$this->user->getPublicData()));
+		
 		$pictures = $store->getByColumns('picture', array('id_user'=>$this->user->id));
 		foreach($pictures as $picture){
-			//$picture[]
+			$this->response->addResponse(array('type'=>'picture', 'data'=>$picture->getPublicData()));
 		}
-		$response->put('pictures', $pictures);
-		$this->response = $response;
+		
+		$woulds = $store->getByColumns('would', array('id_user_would'=>$this->user->id));
+		foreach($woulds as $would){
+			$this->response->addResponse(array('type'=>'would', 'data'=>$would->getPublicData()));
+		}
 	}
 
 	public function actionSettings(){
@@ -51,13 +52,14 @@ class UserController extends BaseController{
 			'default'=>1,
 		);
 		$picture = $store->getByColumns('picture', $columns);
+		if(!is_array($picture))
+			die("image not found!");
 		$randomUser = array(
 			'id'=>$user->id_md5,
 			'name'=>$user->name,
 			'last_seen'=>$user->last_seen,
 			'picture'=>$picture[0]->id_md5,
 		);
-		
 		$response = new JSONResponse();
 		$response->put('randomUser', $randomUser);
 		$this->response = $response;

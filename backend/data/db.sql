@@ -23,6 +23,7 @@ CREATE TABLE `wuersch`.`user`(
   COLLATE utf8_general_ci;
 
 CREATE TABLE `wuersch`.`would`(
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `id_user_would` INT NOT NULL,
   `id_user` INT NOT NULL,
   `would` TINYINT(1) DEFAULT 0 NOT NULL,

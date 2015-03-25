@@ -7,7 +7,7 @@ class SiteController extends BaseController{
 	}
 
 	public function actionIndex(){
-		echo "nothing to do...";
+		$this->response->addResponse(array('type'=>'none', 'data'=>'index'));
 	}
 }
 

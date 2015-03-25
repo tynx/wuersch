@@ -22,7 +22,9 @@ class WouldController extends BaseController{
 		$otherUser = $store->getById('user', $idUser);
 		if($otherUser === null)
 			die("not found!");
-		var_dump($this->storeWould($this->user->id, $otherUser->id));
+		$id = $this->storeWould($this->user->id, $otherUser->id);
+		$would = $store->getById('would', $id);
+		$this->response->addResponse(array('type'=>'would', 'data'=>$would->getPublicData()));
 		
 	}
 
@@ -31,7 +33,22 @@ class WouldController extends BaseController{
 		$otherUser = $store->getById('user', $idUser);
 		if($otherUser === null)
 			die("not found!");
-		var_dump($this->storeWould($this->user->id, $otherUser->id, false));
+		$id = $this->storeWould($this->user->id, $otherUser->id, false);
+		$would = $store->getById('would', $id);
+		$this->response->addResponse(array('type'=>'would', 'data'=>$would->getPublicData()));
+		
+	}
+
+	public function actionGet(){
+		$store = new Store();
+		$columns = array('id_user_would'=>$this->user->id);
+		$woulds = $store->getByColumns('would', $columns);
+		foreach($woulds as $would){
+			$this->response->addResponse(array(
+				'type'=>'would',
+				'data'=>$would->getPublicData(),
+			));
+		}
 	}
 }
 
