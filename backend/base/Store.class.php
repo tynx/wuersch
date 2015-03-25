@@ -47,6 +47,13 @@ class Store{
 		return null;
 	}
 
+	public function getByCustomQuery($query){
+		$sth = Store::$pdo->prepare($query . ';');
+		$sth->execute();
+		$result = $sth->fetchAll(PDO::FETCH_ASSOC);
+		return $result;
+	}
+
 	public function getByColumns($table, $columns, $combination = 'AND'){
 		$query = 'SELECT * FROM `wuersch`.`' . $table . '` WHERE ';
 		foreach($columns as $key=>$value){
@@ -58,7 +65,7 @@ class Store{
 			$query .= ' AND ';
 		}
 		$query = substr($query, 0, -5);
-		$sth = Store::$pdo->prepare($query . ';');
+		$sth = Store::$pdo->prepare($query . ' LIMIT 100;');
 		$sth->execute();
 		return $sth->fetchAll(PDO::FETCH_CLASS, ucfirst($table));
 	}

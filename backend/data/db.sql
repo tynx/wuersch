@@ -36,7 +36,7 @@ CREATE TABLE `wuersch`.`picture`(
   `id_md5` VARCHAR(32) NULL,
   `id_user` INT NOT NULL,
   `fb_id` BIGINT NULL,
-  `front` TINYINT(1) DEFAULT 0 NOT NULL
+  `default` TINYINT(1) DEFAULT 0 NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARACTER SET UTF8
   COLLATE utf8_general_ci;

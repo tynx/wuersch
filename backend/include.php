@@ -14,6 +14,7 @@ require_once('controller/SiteController.class.php');
 require_once('controller/AuthController.class.php');
 require_once('controller/UserController.class.php');
 require_once('controller/PictureController.class.php');
+require_once('controller/WouldController.class.php');
 
 
 function sha1_hmac($key,$data,$blockSize=64,$opad=0x5c,$ipad=0x36) {

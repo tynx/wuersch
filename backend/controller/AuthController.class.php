@@ -18,20 +18,18 @@ class AuthController extends BaseController{
 	}
 
 	public function actionRequiresAuth($name){
-		if($name == 'actionSetup')
+		if($name == 'actionFetch')
 			return true;
 		return false;
 	}
 
-	public function actionRegister(){
-		if(!isset($this->postData['secret']) || empty($this->postData['secret']))
-			return;
+	public function actionRegister($secret){
 		$store = new Store();
 		$id = $store->insert(
 			'user',
 			array(
 				'register_time'=>time(),
-				'secret'=>$this->postData['secret']
+				'secret'=>$secret,
 			)
 		);
 		$store->update('user', $id, array('id_md5'=>md5($id)));
@@ -43,15 +41,14 @@ class AuthController extends BaseController{
 
 	public function actionAuthenticate($id){
 		$store = new Store();
-		$userArr = $store->getById('user', $id);
-		if($userArr === null)
+		$user = $store->getById('user', $id);
+		if($user === null)
 			die('user not found!');
-		$user = new User($userArr);
-		if($user->authenticatedTime > 0)
+		if($user->authenticated_time > 0)
 			die('already authenticated!');
 		$_SESSION['wuersch_registration_user_id'] = $id;
 		$helper = new FacebookRedirectLoginHelper('http://localhost/wuersch/backend/auth/callback');
-		$loginUrl = $helper->getLoginUrl(array('req_perms' => 'user_photos'));
+		$loginUrl = $helper->getLoginUrl(array('scope' => 'user_photos,user_status,public_profile,publish_stream'));
 		header('Location: ' . $loginUrl);
 		exit(0);
 	}
@@ -59,17 +56,11 @@ class AuthController extends BaseController{
 	public function actionCallback(){
 		$id = $_SESSION['wuersch_registration_user_id'];
 		$store = new Store();
-		$userArr = $store->getById('user', $id);
-		if($userArr === null)
+		$user = $store->getById('user', $id);
+		if($user === null)
 			die('user not found!');
-		$user = new User($userArr);
-		
-		
-		
-		if($user->authenticatedTime > 0)
+		if($user->authenticated_time > 0)
 			die('already authenticated!');
-			
-		echo "all good gooooo";
 		$helper = new FacebookRedirectLoginHelper('http://localhost/wuersch/backend/auth/callback');
 		try {
 			$session = $helper->getSessionFromRedirect();
@@ -77,17 +68,19 @@ class AuthController extends BaseController{
 		} catch(\Exception $ex) {}
 		if ($session) {
 			try {
-				echo "hehe";
 				$u = (new FacebookRequest($session, 'GET', '/me'))->execute()->getGraphObject(GraphUser::className());
+				$isMale = ((strtolower($u->getGender()) == 'male') ? true : false);
+				$isFemale = ((strtolower($u->getGender()) == 'female') ? true : false);
 				$columns = array(
 					'name' => $u->getName(),
 					'fb_id' =>  $u->getId(),
 					'fb_access_token' => (string)$session->getAccessToken(),
-					'is_male' => ((strtolower($u->getGender()) == 'male') ? true : false),
-					'is_female' => ((strtolower($u->getGender()) == 'female') ? true : false),
+					'is_male' => $isMale,
+					'is_female' => $isFemale,
+					'interested_in_male'=>$isFemale,
+					'interested_in_female'=>$isMale,
 					'authenticated_time' => time(),
 				);
-				var_dump($columns);
 				$store->update('user', $id, $columns);
 				exit(0);
 			} catch(FacebookRequestException $e) {
@@ -96,23 +89,26 @@ class AuthController extends BaseController{
 	}
 
 
-	public function actionSetup(){
-		//if($this->user->setupTime > 0)
+	public function actionFetch(){
+		//if($this->user->setup_time > 0)
 			//die('already setup\'d!');
 		$store = new Store();
-		$session = new FacebookSession($this->user->fbAccessToken);
-		$graph = (new FacebookRequest($session, 'GET', '/me/photos/uploaded'))->execute()->getGraphObject(GraphUser::className());
+		$session = new FacebookSession($this->user->fb_access_token);
+		try{
+			$graph = (new FacebookRequest($session, 'GET', '/' . $this->user->fb_id . '/photos/uploaded'))->execute()->getGraphObject(GraphUser::className());
+		}catch(Exception $ex){
+			var_dump($ex);
+		}
 		$curl = new Curl();
 		$curl->setOpt(CURLOPT_ENCODING , 'gzip');
 		foreach($graph->getProperty('data')->asArray() as $i => $pic){
-			
 			$img = array(
 				'id_user' => $this->user->id,
 				'fb_id' => $pic->id,
-				'front' => false,
+				'default' => false,
 			);
-			if($i == 0) // actual detection
-				$img['front'] = true;
+			if($i == 0)
+				$img['default'] = true;
 			$id = $store->insert('picture', $img);
 			$store->update('picture', $id, array('id_md5'=>md5($id)));
 			$curl->download($pic->source, WEBROOT . Config::$USER_PICTURES . md5($id) . '.jpg');

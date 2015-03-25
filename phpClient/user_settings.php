@@ -7,10 +7,9 @@ $data = array('interestedInMale' => false, 'interestedInFemale'=> true);
 $json = json_encode($data);
 
 $id = $argv[1];
-$secret = 'mysecret';
+$secret = $argv[2];
 $time = time();
 $toHash = $time . "\npost\nuser/settings\n" . md5($json) . "\n";
-echo '>' . $toHash . '<';
 $hmac = $id . ':' . sha1_hmac($secret, $toHash);
 
 

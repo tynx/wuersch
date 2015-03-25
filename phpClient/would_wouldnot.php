@@ -7,21 +7,21 @@ if(!isset($argv[1]))
 if(!isset($argv[2]))
 	die("Provide secret!");
 if(!isset($argv[3]))
-	die("Provide user to view picture of!");
+	die("Provide other user");
 
 
 $id = $argv[1];
 $secret = $argv[2];
-$userId = $argv[3];
+$idUser = $argv[3];
 
 $time = time();
-$toHash = $time . "\n" . 'get' . "\n" . 'picture?userId=' . $userId . "\n" . md5(null) . "\n";
+$toHash = $time . "\n" . 'get' . "\n" . 'would/not?idUser=' . $idUser . "\n" . md5(null) . "\n";
 $hmac = $id . ':' . sha1_hmac($secret, $toHash);
 
 $curl = new Curl();
 $curl->setHeader('hmac', $hmac);
 $curl->setHeader('timestamp', $time);
 
-$curl->get('http://localhost/wuersch/backend/picture?userId=' . $userId);
+$curl->get('http://localhost/wuersch/backend/would/not?idUser=' . $idUser);
 echo $curl->response;
 ?>
