@@ -14,22 +14,6 @@ class AuthController extends BaseController{
 		return false;
 	}
 
-	public function actionRegister($secret){
-		$store = new Store();
-		$id = $store->insert('user', array(
-			'register_time'=>time(),
-			'secret'=>$secret,
-		));
-		$store->update('user', $id, array('id_md5'=>md5($id)));
-		$this->response->addResponse(array(
-			'type'=>'registration',
-			'data'=>array(
-				'id' => md5($id),
-				'authenticationURL' => 'http://localhost/wuersch/backend/auth/authenticate?id=' . md5($id),
-			),
-		));
-	}
-
 	public function actionAuthenticate($id){
 		$this->initFB();
 		$store = new Store();
@@ -124,14 +108,10 @@ class AuthController extends BaseController{
 			$store->update('picture', $id, array('id_md5'=>md5($id)));
 			$curl->download($pic->source, WEBROOT . Config::$USER_PICTURES . md5($id) . '.jpg');
 			$picture = $store->getById('picture', $id);
-			$this->response->addResponse(array(
-				'type'=>'picture',
-				'additional_status'=>'downloaded.',
-				'data'=>$picture->getPublicData(),
-			));
+			$this->addResponse('picture', $picture->getPublicData(), 'downloaded');
 		}
 		$columns = array(
-			'setup_time' => time(),
+			'fetch_time' => time(),
 		);
 		$store->update('user', $this->user->id_md5, $columns);
 	}

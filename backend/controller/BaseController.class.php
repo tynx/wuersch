@@ -4,7 +4,7 @@ abstract class BaseController{
 
 	protected $postData = array();
 	protected $request = null;
-	protected $response = null;
+	private $response = null;
 	protected $user = null;
 
 	public final function __construct(){
@@ -29,7 +29,17 @@ abstract class BaseController{
 	}
 
 	protected final function error($errorMessage){
-		$this->response->markAsError('user was not found!');
+		$this->response->markAsError($errorMessage);
+	}
+
+	protected final function addResponse($type, $data, $additionalStatus = null){
+		$response = array(
+			'type' =>$type,
+			'data' => $data,
+		);
+		if($additionalStatus !== null)
+			$response['additionalStatus'] = $additionalStatus;
+		$this->response->addResponse($response);
 	}
 }
 

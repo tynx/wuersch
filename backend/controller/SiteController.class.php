@@ -7,7 +7,7 @@ class SiteController extends BaseController{
 	}
 
 	public function actionIndex(){
-		$this->response->addResponse(array('type'=>'none', 'data'=>'index'));
+		$this->error('Provide controller/action! Invalid request!');
 	}
 }
 

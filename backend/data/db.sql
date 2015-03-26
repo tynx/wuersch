@@ -13,7 +13,7 @@ CREATE TABLE `wuersch`.`user`(
   `is_female` TINYINT(1) NOT NULL DEFAULT 0,
   `interested_in_male` TINYINT(1) NOT NULL DEFAULT 0,
   `interested_in_female` TINYINT(1) NOT NULL DEFAULT 0,
-  `setup_time` TINYINT(1) NOT NULL DEFAULT 0,
+  `fetch_time` BIGINT NOT NULL DEFAULT 0,
   `register_time` BIGINT NOT NULL DEFAULT 0,
   `authenticated_time` BIGINT NOT NULL DEFAULT 0,
   `last_seen` BIGINT NULL,
