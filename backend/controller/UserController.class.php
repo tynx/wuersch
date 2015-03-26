@@ -44,25 +44,22 @@ class UserController extends BaseController{
 		$query .= 'LIMIT 100;';
 		$store = new Store();
 		$result = $store->getByCustomQuery($query);
-		if(count($result)==0)
-			die("no user found!");
+		if(count($result)==0){
+			$this->error("No random user found!");
+			return;
+		}
 		$user = $store->getById('user', $result[rand(0, count($result)-1)]['id']);
+		$this->response->addResponse(array('type'=>'user', 'data'=>$user->getPublicData()));
 		$columns = array(
 			'id_user'=>$user->id,
 			'default'=>1,
 		);
 		$picture = $store->getByColumns('picture', $columns);
-		if(!is_array($picture))
-			die("image not found!");
-		$randomUser = array(
-			'id'=>$user->id_md5,
-			'name'=>$user->name,
-			'last_seen'=>$user->last_seen,
-			'picture'=>$picture[0]->id_md5,
-		);
-		$response = new JSONResponse();
-		$response->put('randomUser', $randomUser);
-		$this->response = $response;
+		if(!is_array($picture) && count($picture) != 1){
+			$this->error("No picture found for user!");
+			return;
+		}
+		$this->response->addResponse(array('type'=>'picture', 'data'=>$picture[0]->getPublicData()));
 	}
 }
 

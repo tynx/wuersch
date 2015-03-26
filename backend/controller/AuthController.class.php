@@ -110,7 +110,7 @@ class AuthController extends BaseController{
 			return;
 		}
 		foreach($graph->getProperty('data')->asArray() as $i => $pic){
-			$found = $store->getByColumns('picture', array('fb_id'=>$pic->id));
+			$found = $store->getByColumns('picture', array('fb_id'=>$pic->id, 'id_user'=>$this->user->id));
 			if(count($found) > 0)
 				continue;
 			$img = array(
