@@ -2,14 +2,14 @@
 
 include('include.php');
 
-if(!isset($argv[1]) || ($argv[1]!='show' && $argv[1]!='get'))
-	die("Provide action! get, show");
+if(!isset($argv[1]) || ($argv[1]!='show' && $argv[1]!='get' && $argv[1]!='setDefault'))
+	die("Provide action! get, show, setDefault");
 if(!isset($argv[2]))
 	die("Provide ID!");
 if(!isset($argv[3]))
 	die("Provide secret!");
-if(!isset($argv[4]) && ($argv[1]=='show'))
-	die("Provide other user ID!");
+if(!isset($argv[4]) && ($argv[1]=='show' || $argv[1] == 'setDefault'))
+	die("Provide other user ID or defaultIMG id!");
 
 $time = time();
 
@@ -20,6 +20,9 @@ if($argv[1] == 'show'){
 }elseif($argv[1] == 'get'){
 	$toHash = $time . "\n" . 'get' . "\n" . 'picture/get' . "\n" . md5(null) . "\n";
 	$url .= '/get';
+}elseif($argv[1] == 'setDefault'){
+	$toHash = $time . "\n" . 'get' . "\n" . 'picture/setDefault?idPicture=' . $argv[4] . "\n" . md5(null) . "\n";
+	$url .= '/setDefault?idPicture=' . $argv[4];
 }
 
 $hmac = $argv[2] . ':' . sha1_hmac($argv[3], $toHash);
