@@ -25,7 +25,6 @@ if($argv[1] == 'get'){
 	$url .= '?idUser=' . $argv[4];
 }
 
-echo $toHash;
 $hmac = $argv[2] . ':' . sha1_hmac($argv[3], $toHash);
 $curl = new Curl();
 $curl->setHeader('hmac', $hmac);

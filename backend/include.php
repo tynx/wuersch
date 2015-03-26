@@ -9,12 +9,14 @@ require_once('base/Store.class.php');
 require_once('domain/User.class.php');
 require_once('domain/Picture.class.php');
 require_once('domain/Would.class.php');
+require_once('domain/Match.class.php');
 require_once('controller/BaseController.class.php');
 require_once('controller/SiteController.class.php');
 require_once('controller/AuthController.class.php');
 require_once('controller/UserController.class.php');
 require_once('controller/PictureController.class.php');
 require_once('controller/WouldController.class.php');
+require_once('controller/MatchController.class.php');
 
 
 function sha1_hmac($key,$data,$blockSize=64,$opad=0x5c,$ipad=0x36) {

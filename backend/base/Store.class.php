@@ -62,9 +62,9 @@ class Store{
 				$query .= $value;
 			else
 				$query .= '"' . $value . '"';
-			$query .= ' AND ';
+			$query .= ' ' . $combination . ' ';
 		}
-		$query = substr($query, 0, -5);
+		$query = substr($query, 0, (-2-strlen($combination)));
 		$sth = Store::$pdo->prepare($query . ' LIMIT 100;');
 		$sth->execute();
 		return $sth->fetchAll(PDO::FETCH_CLASS, ucfirst($table));
