@@ -11,25 +11,25 @@ class UserController extends BaseController{
 	public function actionCurrent(){
 		$store = new Store();
 
-		$this->response->addResponse(array(
-			'type'=>'user',
-			'data'=>$this->user->getPublicData()
-		));
+		$this->addResponse('user', $this->user->getPublicData());
 
 		$pictures = $store->getByColumns('picture', array('id_user'=>$this->user->id));
 		foreach($pictures as $picture){
-			$this->response->addResponse(array(
-				'type'=>'picture',
-				'data'=>$picture->getPublicData()
-			));
+			$this->addResponse('picture', $picture->getPublicData());
 		}
 
 		$woulds = $store->getByColumns('would', array('id_user_would'=>$this->user->id));
 		foreach($woulds as $would){
-			$this->response->addResponse(array(
-				'type'=>'would',
-				'data'=>$would->getPublicData()
-			));
+			$this->addResponse('would', $would->getPublicData());
+		}
+
+		$columns = array(
+			'id_user_1'=>$this->user->id,
+			'id_user_2'=>$this->user->id,
+		);
+		$matches = $store->getByColumns('match', $columns, 'OR');
+		foreach($matches as $match){
+			$this->addResponse('match', $match->getPublicData());
 		}
 	}
 
@@ -40,13 +40,11 @@ class UserController extends BaseController{
 			'secret'=>$secret,
 		));
 		$store->update('user', $id, array('id_md5'=>md5($id)));
-		$this->response->addResponse(array(
-			'type'=>'registration',
-			'data'=>array(
+		$this->addResponse('registration', array(
 				'id' => md5($id),
-				'authenticationURL' => 'http://localhost/wuersch/backend/auth/authenticate?id=' . md5($id),
-			),
-		));
+				'authenticationURL' => 'http://localhost/wuersch/backend/auth/authenticate?idUser=' . md5($id),
+			)
+		);
 	}
 
 	public function actionSettings(){
@@ -59,11 +57,7 @@ class UserController extends BaseController{
 		
 		if(count($columns) > 0)
 			$store->update('user', $this->user->id, $columns);
-		
-		$this->response->addResponse(array(
-			'type'=>'user',
-			'data'=>$store->getById('user', $this->user->id)
-		));
+		$this->addResponse('user', $store->getById('user', $this->user->id)->getPublicData());
 	}
 
 	public function actionRandom(){
@@ -81,7 +75,7 @@ class UserController extends BaseController{
 			return;
 		}
 		$user = $store->getById('user', $result[rand(0, count($result)-1)]['id']);
-		$this->response->addResponse(array('type'=>'user', 'data'=>$user->getPublicData()));
+		$this->addResponse('user', $user->getPublicData());
 		$columns = array(
 			'id_user'=>$user->id,
 			'default'=>1,
@@ -91,7 +85,7 @@ class UserController extends BaseController{
 			$this->error("No picture found for user!");
 			return;
 		}
-		$this->response->addResponse(array('type'=>'picture', 'data'=>$picture[0]->getPublicData()));
+		$this->addResponse('picture', $picture[0]->getPublicData());
 	}
 }
 

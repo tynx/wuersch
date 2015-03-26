@@ -32,14 +32,11 @@ class PictureController extends BaseController{
 		$columns = array('id_user'=>$this->user->id);
 		$pictures = $store->getByColumns('picture', $columns);
 		foreach($pictures as $picture){
-			$this->response->addResponse(array(
-				'type'=>'picture',
-				'data'=>$picture->getPublicData(),
-			));
+			$this->addResponse('picture', $picture->getPublicData());
 		}
 	}
 
-	public function actionSetDefault($idPicture){
+	public function actionDefault($idPicture){
 		$store = new Store();
 
 		$columns = array('id_user'=>$this->user->id, 'default'=>true);

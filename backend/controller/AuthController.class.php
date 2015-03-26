@@ -14,15 +14,15 @@ class AuthController extends BaseController{
 		return false;
 	}
 
-	public function actionAuthenticate($id){
+	public function actionAuthenticate($idUser){
 		$this->initFB();
 		$store = new Store();
-		$user = $store->getById('user', $id);
+		$user = $store->getById('user', $idUser);
 		if($user === null)
 			die('user not found!');
 		if($user->authenticated_time > 0)
 			die('already authenticated!');
-		$_SESSION['wuersch_registration_user_id'] = $id;
+		$_SESSION['wuersch_registration_user_id'] = $idUser;
 		$helper = new FacebookRedirectLoginHelper('http://localhost/wuersch/backend/auth/callback');
 		$loginUrl = $helper->getLoginUrl(array('scope' => 'user_photos,user_status,public_profile,publish_stream'));
 		header('Location: ' . $loginUrl);
@@ -59,7 +59,7 @@ class AuthController extends BaseController{
 				$isFemale = ((strtolower($u->getGender()) == 'female') ? true : false);
 				$columns = array(
 					'name' => $u->getName(),
-					'fb_id' =>  $u->getId(),
+					'id_fb' =>  $u->getId(),
 					'fb_access_token' => (string)$session->getAccessToken(),
 					'is_male' => $isMale,
 					'is_female' => $isFemale,
@@ -81,7 +81,7 @@ class AuthController extends BaseController{
 		$store = new Store();
 		$session = new FacebookSession($this->user->fb_access_token);
 		try{
-			$request = new FacebookRequest($session, 'GET', '/' . $this->user->fb_id . '/photos/uploaded');
+			$request = new FacebookRequest($session, 'GET', '/' . $this->user->id_fb . '/photos/uploaded');
 			$graph = $request->execute()->getGraphObject(GraphUser::className());
 		}catch(Exception $ex){
 			$this->error($ex->toString());
@@ -99,7 +99,7 @@ class AuthController extends BaseController{
 				continue;
 			$img = array(
 				'id_user' => $this->user->id,
-				'fb_id' => $pic->id,
+				'id_fb' => $pic->id,
 				'default' => false,
 			);
 			if($i == 0)

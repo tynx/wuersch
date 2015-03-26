@@ -7,7 +7,7 @@ CREATE TABLE `wuersch`.`user`(
   `id_md5` VARCHAR(32) NULL,
   `secret` VARCHAR(1024) NULL,
   `name` VARCHAR(2048) NULL,
-  `fb_id` BIGINT NULL,
+  `id_fb` BIGINT NULL,
   `fb_access_token` VARCHAR(1024) NULL,
   `is_male` TINYINT(1) NOT NULL DEFAULT 0,
   `is_female` TINYINT(1) NOT NULL DEFAULT 0,
@@ -27,7 +27,7 @@ CREATE TABLE `wuersch`.`would`(
   `id_user_would` INT NOT NULL,
   `id_user` INT NOT NULL,
   `would` TINYINT(1) DEFAULT 0 NOT NULL,
-  `time` BIGINT NULL
+  `time` BIGINT NOT NULL DEFAULT 0
 ) ENGINE = InnoDB
   DEFAULT CHARACTER SET UTF8
   COLLATE utf8_general_ci;
@@ -36,8 +36,24 @@ CREATE TABLE `wuersch`.`picture`(
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `id_md5` VARCHAR(32) NULL,
   `id_user` INT NOT NULL,
-  `fb_id` BIGINT NULL,
-  `default` TINYINT(1) DEFAULT 0 NOT NULL
+  `id_fb` BIGINT NULL,
+  `default` TINYINT(1) DEFAULT 0 NOT NULL,
+  `time` BIGINT NOT NULL DEFAULT 0
 ) ENGINE = InnoDB
   DEFAULT CHARACTER SET UTF8
   COLLATE utf8_general_ci;
+
+CREATE TABLE `wuersch`.`match`(
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_user_1` INT NOT NULL,
+  `id_user_2` INT NOT NULL,
+  `time` BIGINT NOT NULL DEFAULT 0
+) ENGINE = InnoDB
+  DEFAULT CHARACTER SET UTF8
+  COLLATE utf8_general_ci;
+
+ALTER TABLE `wuersch`.`would` ADD CONSTRAINT `would_user1` FOREIGN KEY (`id_user_would`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `wuersch`.`would` ADD CONSTRAINT `would_user2` FOREIGN KEY (`id_user`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `wuersch`.`picture` ADD CONSTRAINT `picture_user` FOREIGN KEY (`id_user`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `wuersch`.`match` ADD CONSTRAINT `match_user1` FOREIGN KEY (`id_user_1`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `wuersch`.`match` ADD CONSTRAINT `match_user2` FOREIGN KEY (`id_user_2`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
