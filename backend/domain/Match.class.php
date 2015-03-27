@@ -9,7 +9,7 @@ class Match{
 		return array(
 			'idUser1' => $user1->id_md5,
 			'idUser2' => $user2->id_md5,
-			'time'    => $this->time,
+			'time'    => (int)$this->time,
 		);
 	}
 }

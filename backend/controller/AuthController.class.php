@@ -23,8 +23,8 @@ class AuthController extends BaseController{
 		if($user->authenticated_time > 0)
 			die('already authenticated!');
 		$_SESSION['wuersch_registration_user_id'] = $idUser;
-		$helper = new FacebookRedirectLoginHelper('http://localhost/wuersch/backend/auth/callback');
-		$loginUrl = $helper->getLoginUrl(array('scope' => 'user_photos,user_status,public_profile,publish_stream'));
+		$helper = new FacebookRedirectLoginHelper(Config::$FACEBOOK_APP_REDIRECT_URL);
+		$loginUrl = $helper->getLoginUrl(array('scope' => Config::$FACEBOOK_APP_SCOPES));
 		header('Location: ' . $loginUrl);
 		exit(0);
 	}
@@ -42,7 +42,7 @@ class AuthController extends BaseController{
 			$this->error('this user was already authenticated!');
 			return;
 		}
-		$helper = new FacebookRedirectLoginHelper('http://localhost/wuersch/backend/auth/callback');
+		$helper = new FacebookRedirectLoginHelper(Config::$FACEBOOK_APP_REDIRECT_URL);
 		try {
 			$session = $helper->getSessionFromRedirect();
 		} catch(FacebookRequestException $ex) {
@@ -58,21 +58,23 @@ class AuthController extends BaseController{
 				$isMale = ((strtolower($u->getGender()) == 'male') ? true : false);
 				$isFemale = ((strtolower($u->getGender()) == 'female') ? true : false);
 				$columns = array(
-					'name' => $u->getName(),
-					'id_fb' =>  $u->getId(),
-					'fb_access_token' => (string)$session->getAccessToken(),
-					'is_male' => $isMale,
-					'is_female' => $isFemale,
-					'interested_in_male'=>$isFemale,
-					'interested_in_female'=>$isMale,
-					'authenticated_time' => time(),
+					'name'                 => $u->getName(),
+					'id_fb'                => $u->getId(),
+					'fb_access_token'      => $session->getAccessToken(),
+					'is_male'              => $isMale,
+					'is_female'            => $isFemale,
+					'interested_in_male'   => $isFemale,
+					'interested_in_female' => $isMale,
+					'authenticated_time'   => time(),
 				);
 				$store->update('user', $id, $columns);
+				return;
 			} catch(FacebookRequestException $e) {
 				$this->error($e->toString());
 				return;
 			}  
 		}
+		$this->error('Was this URL called by Facebook or yourself?!');
 	}
 
 
@@ -99,8 +101,9 @@ class AuthController extends BaseController{
 				continue;
 			$img = array(
 				'id_user' => $this->user->id,
-				'id_fb' => $pic->id,
+				'id_fb'   => $pic->id,
 				'default' => false,
+				'time'    => time(),
 			);
 			if($i == 0)
 				$img['default'] = true;

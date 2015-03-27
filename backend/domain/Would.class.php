@@ -8,8 +8,8 @@ class Would{
 		return array(
 			'idUserWould' => $userWould->id_md5,
 			'idUser'      => $user->id_md5,
-			'would'       => $this->would,
-			'time'        => $this->time,
+			'would'       => (boolean)$this->would,
+			'time'        => (int)$this->time,
 		);
 	}
 }
