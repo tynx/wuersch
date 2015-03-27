@@ -99,7 +99,7 @@ The *match* object
 - would/not
   - This will mark that the user would NOT do the other user (provided by idUser)
 
-### Authentication
+### Registration
 The backend works with the PHP Facebook SDK. For authenticating a new user you have to create a unique and good random password (e.g 32 alphanumeric). With this newly created secret you can register in the backend and you will get a client-id. From that point on the secret should stay an absolute secret and never be sent or displayed in any form and stored locally in a safe manner.
 Example:
 ```
@@ -113,3 +113,98 @@ Returns:
 Then you open a cookie-based browser (probably webview on android) and authenticate the user agains FB and our Facebook-App. The url is provided by the registration call.
 When a redirect happened to our backend and the response is empty (or just a "everything good" message) you have successfuly registere. Don't forget to call auth/fetch as without that call you won't have picture.
 
+### Authentication
+For the authentication use HMAC. You have to set two headers: timestamp and hmac.
+- timestamp
+  - unix timestamp which has to be the same used in the hmac-hash
+- hmac
+  - 4 fields: time, method, path, md5(content)
+
+example-GET:
+```
+sha1_hmac($time . "\nget\nuser/current\n" . md5(null) . "\n") => hmac-header
+```
+example-POST
+```
+sha1_hmac($time . "\npost\nuser/settings\n" . md5($body) . "\n") => hmac-header
+```
+
+### Example
+user/current
+```
+{
+    "status": "OK",
+    "statusMessage": "All good.",
+    "responses": [
+        {
+            "type": "user",
+            "data": {
+                "id": "c4ca4238a0b923820dcc509a6f75849b",
+                "name": " ... ",
+                "lastSeen": 1427442497,
+                "isMale": true,
+                "isFemale": false,
+                "interestedInMale": false,
+                "interestedInFemale": true
+            }
+        },
+        {
+            "type": "picture",
+            "data": {
+                "id": "c4ca4238a0b923820dcc509a6f75849b",
+                "isDefault": true,
+                "time": 0
+            }
+        },
+        {
+            "type": "picture",
+            "data": {
+                "id": "c81e728d9d4c2f636f067f89cc14862c",
+                "isDefault": false,
+                "time": 0
+            }
+        },
+        {
+            "type": "picture",
+            "data": {
+                "id": "eccbc87e4b5ce2fe28308fd9f2a7baf3",
+                "isDefault": false,
+                "time": 0
+            }
+        },
+        {
+            "type": "picture",
+            "data": {
+                "id": "a87ff679a2f3e71d9181a67b7542122c",
+                "isDefault": false,
+                "time": 0
+            }
+        },
+        {
+            "type": "picture",
+            "data": {
+                "id": "e4da3b7fbbce2345d7772b0674a318d5",
+                "isDefault": false,
+                "time": 0
+            }
+        },
+        {
+            "type": "would",
+            "data": {
+                "idUserWould": "c4ca4238a0b923820dcc509a6f75849b",
+                "idUser": "eccbc87e4b5ce2fe28308fd9f2a7baf3",
+                "would": true,
+                "time": 1427386098
+            }
+        },
+        {
+            "type": "match",
+            "data": {
+                "idUser1": "c4ca4238a0b923820dcc509a6f75849b",
+                "idUser2": "eccbc87e4b5ce2fe28308fd9f2a7baf3",
+                "time": 1427386098
+            }
+        }
+    ]
+}
+```

@@ -49,5 +49,7 @@ if($argv[1]=='settings'){
 }else{
 	$curl->get($url);
 }
+
 var_dump($curl->response);
+echo json_encode($curl->response);
 ?>
