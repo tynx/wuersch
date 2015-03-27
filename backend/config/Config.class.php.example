@@ -13,6 +13,8 @@ class Config{
 
 	public static $FACEBOOK_APP_ID = '';
 	public static $FACEBOOK_APP_SECRET = '';
+	public static $FACEBOOK_APP_REDIRECT_URL = '';
+	public static $FACEBOOK_APP_SCOPES = '';
 
 	public static $AUTH_TIME_THRESHOLD = 5;
 }
