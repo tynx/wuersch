@@ -16,7 +16,7 @@ CREATE TABLE `wuersch`.`user`(
   `fetch_time` BIGINT NOT NULL DEFAULT 0,
   `register_time` BIGINT NOT NULL DEFAULT 0,
   `authenticated_time` BIGINT NOT NULL DEFAULT 0,
-  `last_seen` BIGINT NULL,
+  `last_seen` BIGINT NOT NULL DEFAULT 0,
   `last_ip` VARCHAR(45) NULL
 ) ENGINE = InnoDB
   DEFAULT CHARACTER SET UTF8
@@ -52,8 +52,8 @@ CREATE TABLE `wuersch`.`match`(
   DEFAULT CHARACTER SET UTF8
   COLLATE utf8_general_ci;
 
-ALTER TABLE `wuersch`.`would` ADD CONSTRAINT `would_user1` FOREIGN KEY (`id_user_would`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE `wuersch`.`would` ADD CONSTRAINT `would_user2` FOREIGN KEY (`id_user`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE `wuersch`.`picture` ADD CONSTRAINT `picture_user` FOREIGN KEY (`id_user`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE `wuersch`.`match` ADD CONSTRAINT `match_user1` FOREIGN KEY (`id_user_1`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE `wuersch`.`match` ADD CONSTRAINT `match_user2` FOREIGN KEY (`id_user_2`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `wuersch`.`would` ADD CONSTRAINT `fk_would_user1` FOREIGN KEY (`id_user_would`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `wuersch`.`would` ADD CONSTRAINT `fk_would_user2` FOREIGN KEY (`id_user`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `wuersch`.`picture` ADD CONSTRAINT `fk_picture_user` FOREIGN KEY (`id_user`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `wuersch`.`match` ADD CONSTRAINT `fk_match_user1` FOREIGN KEY (`id_user_1`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `wuersch`.`match` ADD CONSTRAINT `fk_match_user2` FOREIGN KEY (`id_user_2`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
