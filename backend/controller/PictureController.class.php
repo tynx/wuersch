@@ -7,8 +7,7 @@ class PictureController extends BaseController{
 	}
 
 	public function actionIndex($idUser){
-		$store = new Store();
-		$user = $store->getById('user', $idUser);
+		$user = $this->getStore()->getById('user', $idUser);
 		if($user === null){
 			$this->markAsError('Provided user not found!');
 			return;
@@ -17,7 +16,7 @@ class PictureController extends BaseController{
 			'id_user'=>$user->id,
 			'default'=>1,
 		);
-		$picture = $store->getByColumns('picture', $columns);
+		$picture = $this->getStore()->getByColumns('picture', $columns);
 		if(!is_array($picture) || count($picture) !== 1){
 			$this->markAsError('No picture found!');
 			return;
@@ -28,19 +27,16 @@ class PictureController extends BaseController{
 	}
 
 	public function actionGet(){
-		$store = new Store();
 		$columns = array('id_user'=>$this->user->id);
-		$pictures = $store->getByColumns('picture', $columns);
+		$pictures = $this->getStore()->getByColumns('picture', $columns);
 		foreach($pictures as $picture){
 			$this->addResponse('picture', $picture->getPublicData());
 		}
 	}
 
 	public function actionDefault($idPicture){
-		$store = new Store();
-
 		$columns = array('id_user'=>$this->user->id, 'default'=>true);
-		$oldDefault = $store->getByColumns('picture', $columns);
+		$oldDefault = $this->getStore()->getByColumns('picture', $columns);
 		if(!is_array($oldDefault) && count($oldDefault) !== 1){
 			$this->markAsError('Error while finding default picture!');
 			return;
@@ -51,17 +47,17 @@ class PictureController extends BaseController{
 			return;
 		}
 
-		$newDefault = $store->getById('picture', $idPicture);
+		$newDefault = $this->getStore()->getById('picture', $idPicture);
 		if($newDefault === null || $newDefault->id_user !== $this->user->id){
 			$this->markAsError('Not a valid picture ID provided!');
 			return;
 		}
 
-		$store->update('picture', $oldDefault->id, array('default'=>false));
-		$store->update('picture', $newDefault->id, array('default'=>true));
+		$this->getStore()->update('picture', $oldDefault->id, array('default'=>false));
+		$this->getStore()->update('picture', $newDefault->id, array('default'=>true));
 		$columns = array('id_user'=>$this->user->id, 'id_md5'=>$idPicture);
-		$oldDefault = $store->getById('picture', $oldDefault->id);
-		$newDefault = $store->getById('picture', $newDefault->id);
+		$oldDefault = $this->getStore()->getById('picture', $oldDefault->id);
+		$newDefault = $this->getStore()->getById('picture', $newDefault->id);
 		$this->addResponse('picture', $newDefault->getPublicData(), 'new default');
 		$this->addResponse('picture', $oldDefault->getPublicData(), 'old default');
 	}

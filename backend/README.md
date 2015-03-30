@@ -26,7 +26,13 @@ The status is either "OK" or "FAIL" indicating whetever the overall call was suc
 The responses are Objects of a type and can be mixed. As example: as responses you could have a user1 and user2 as well as user and his pictures.
 
 ### Domain
-The *user* object:
+The **Registration** object:
+```
+["id"]=>string(32) "6512bd43d9caa6e02c990b0a82652dca"
+["authenticationURL"]=>string(90) " ... "
+```
+
+The **User** object:
 ```
 ["id"]=>string(32) "c4ca4238a0b923820dcc509a6f75849b"
 ["name"]=>string(14) " ... "
@@ -36,25 +42,30 @@ The *user* object:
 ["interestedInMale"]=>bool(false)
 ["interestedInFemale"]=>bool(true)
 ```
-The *picture* object:
+
+The **Picture** object:
 ```
 ["id"]=>string(32) "eccbc87e4b5ce2fe28308fd9f2a7baf3"
 ["isDefault"]=>bool(false)
 ["time"]=>int(0)
 ```
-The *would* object:
+
+The **Would** object:
 ```
 ["idUserWould"]=>string(32) "c4ca4238a0b923820dcc509a6f75849b"
 ["idUser"]=>string(32) "eccbc87e4b5ce2fe28308fd9f2a7baf3"
 ["would"]=>bool(true)
 ["time"]=>int(1427386098)
 ```
-The *match* object
+
+The **Match** object
 ```
 ["idUser1"]=>string(32) "c4ca4238a0b923820dcc509a6f75849b"
 ["idUser2"]=>string(32) "eccbc87e4b5ce2fe28308fd9f2a7baf3"
 ["time"]=>int(1427386098)
 ```
+
+
 
 ### Methods
 | Controller | Action       | Requires Auth | Method | GET-Args  | POST-Args |
