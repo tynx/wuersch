@@ -7,9 +7,7 @@ class MatchController extends BaseController{
 	}
 
 	public function actionIs($idUser){
-		$store = new Store();
-		
-		$otherUser = $store->getById('user', $idUser);
+		$otherUser = $this->getStore()->getById('user', $idUser);
 		if($otherUser === null){
 			$this->markAsError('Provided user not found!');
 			return;
@@ -18,7 +16,7 @@ class MatchController extends BaseController{
 			'id_user_1'=>$this->user->id,
 			'id_user_2'=>$otherUser->id,
 		);
-		$match = $store->getByColumns('match', $columns);
+		$match = $this->getStore()->getByColumns('match', $columns);
 		if(is_array($match) && count($match) === 1){
 			$this->addResponse('match', $match[0]->getPublicData());
 			return;
@@ -27,7 +25,7 @@ class MatchController extends BaseController{
 			'id_user_1'=>$otherUser->id,
 			'id_user_2'=>$this->user->id,
 		);
-		$match = $store->getByColumns('match', $columns);
+		$match = $this->getStore()->getByColumns('match', $columns);
 		if(is_array($match) && count($match) === 1){
 			$this->addResponse('match', $match[0]->getPublicData());
 			return;
@@ -35,12 +33,11 @@ class MatchController extends BaseController{
 	}
 
 	public function actionGet(){
-		$store = new Store();
 		$columns = array(
 			'id_user_1'=>$this->user->id,
 			'id_user_2'=>$this->user->id,
 		);
-		$matches = $store->getByColumns('match', $columns, 'OR');
+		$matches = $this->getStore()->getByColumns('match', $columns, 'OR');
 		foreach($matches as $match)
 			$this->addResponse('match', $match->getPublicData());
 	}
