@@ -68,7 +68,7 @@ class AuthController extends BaseController{
 				$this->getStore()->update('user', $id, $columns);
 				return;
 			} catch(FacebookRequestException $e) {
-				$this->error($e->toString());
+				$this->error($e);
 				return;
 			}  
 		}
@@ -83,7 +83,7 @@ class AuthController extends BaseController{
 			$request = new FacebookRequest($session, 'GET', '/' . $this->user->id_fb . '/photos/uploaded');
 			$graph = $request->execute()->getGraphObject(GraphUser::className());
 		}catch(Exception $ex){
-			$this->error($ex->toString());
+			$this->error($ex);
 			return;
 		}
 		$curl = new Curl();
@@ -93,7 +93,7 @@ class AuthController extends BaseController{
 			return;
 		}
 		foreach($graph->getProperty('data')->asArray() as $i => $pic){
-			$found = $this->getStore()->getByColumns('picture', array('fb_id'=>$pic->id, 'id_user'=>$this->user->id));
+			$found = $this->getStore()->getByColumns('picture', array('id_fb'=>$pic->id, 'id_user'=>$this->user->id));
 			if(count($found) > 0)
 				continue;
 			$img = array(
