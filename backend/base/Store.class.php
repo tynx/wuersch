@@ -2,6 +2,9 @@
 
 class Store{
 	private static $pdo = null;
+	private static $query = null;
+
+	private $statementResult = null;
 
 	public function __construct(){
 		if(Store::$pdo === null)
@@ -9,6 +12,7 @@ class Store{
 	}
 
 	private function init(){
+		Store::$query = new StoreMysqlQuery(Config::$PDO_DATABASE);
 		$host = 'host=' . Config::$PDO_HOST;
 		$db = 'dbname=' . Config::$PDO_DATABASE;
 		$charset = 'charset=' . Config::$PDO_CHARSET;
@@ -20,95 +24,108 @@ class Store{
 		);
 	}
 
-	private function packValue($value){
-		if(is_bool($value)){
-			$value = ($value === true) ? '1' : '0';
-		}elseif(is_numeric($value)){
-			$value = $value;
+	private function buildWhereColumns($id){
+		$whereColumns = array();
+		if(!is_numeric($id) && strlen($id)==32){
+			$whereColumns['id_md5'] = $id;
 		}else{
-			$value = '"' . $value . '"';
+			$whereColumns['id'] = (int)$id;
 		}
-		return $value;
+		return $whereColumns;
 	}
 
-	public function getById($table, $id){
-		$query = 'SELECT * FROM `wuersch`.`' . $table . '` WHERE ';
-		if(!is_numeric($id) && strlen($id)==32){
-			$query .= '`id_md5`=?';
-		}else{
-			$query .= '`id`=?';
+	private function execute($sql, $whereColumns = null, $valueColumns = null, $fetch = false, $fetchClass = null){
+		if(substr($sql, -1) !== ';')
+			$sql .= ';';
+		$statement = Store::$pdo->prepare($sql);
+		if($whereColumns !== null && is_array($whereColumns)){
+			foreach($whereColumns as $key=>$value){
+				$statement->bindValue(':w' . $key, $value);
+			}
 		}
-		$stmt = Store::$pdo->prepare($query . ';');
-		$stmt->bindParam(1, $id);
-		$stmt->execute();
-		$result = $stmt->fetchAll(PDO::FETCH_CLASS, ucfirst($table));
-		if(count($result) === 1){
+		if($valueColumns !== null && is_array($valueColumns)){
+			foreach($valueColumns as $key=>$value){
+				$statement->bindValue(':v' . $key, $value);
+			}
+		}
+		if(!$statement->execute()){
+			return false;
+		}
+		if(!$fetch && $statement->rowCount() > 1){
+			$this->statementResult = true;
+		}elseif(!$fetch){
+			$this->statementResult = (int)Store::$pdo->lastInsertId();
+			if($this->statementResult === 0 && $statement->rowCount() === 1)
+				$this->statementResult = true;
+			elseif($this->statementResult === 0 && $statement->rowCount() === 0)
+				$this->statementResult = false;
+		}elseif($fetchClass === null){
+			$this->statementResult = $statement->fetchAll(PDO::FETCH_ASSOC);
+		}else{
+			$this->statementResult = $statement->fetchAll(PDO::FETCH_CLASS, $fetchClass);
+		}
+		return true;
+	}
+
+	public function getByColumns($table, $whereColumns, $combination = 'AND'){
+		$sql = Store::$query->getSelectSql($table, $whereColumns, $combination);
+		if(class_exists(ucfirst($table), false))
+			$class = ucfirst($table);
+		if($this->execute($sql, $whereColumns, null, true, $class))
+			return $this->statementResult;
+		return null;
+	}
+
+	public function insert($table, $valueColumns){
+		if(!is_array($valueColumns))
+			return -1;
+		$sql = Store::$query->getInsertSql($table, $valueColumns);
+		if($this->execute($sql, null, $valueColumns))
+			return $this->statementResult;
+		return -1;
+	}
+
+
+	public function updateByColumns($table, $valueColumns, $whereColumns = null, $combination = 'AND'){
+		if(!is_array($valueColumns) && !is_array($valueColumns))
+			return false;
+		$sql = Store::$query->getUpdateSql($table, $valueColumns, $whereColumns, $combination);
+		if($this->execute($sql, $whereColumns, $valueColumns))
+			return $this->statementResult;
+		return false;
+	}
+
+	public function deleteByColumns($table, $whereColumns, $combination = 'AND'){
+		$sql = Store::$query->getDeleteSql($table, $whereColumns, $combination);
+		if($this->execute($sql, $whereColumns, null))
+			return $this->statementResult;
+		return null;
+	}
+
+// HELPER
+	public function getById($table, $id){
+		$result = $this->getByColumns($table, $this->buildWhereColumns($id));
+		if(is_array($result) && count($result) === 1){
 			return $result[0];
 		}
 		return null;
 	}
 
+	public function updateById($table, $id, $valueColumns){
+		return $this->updateByColumns($table, $valueColumns, $this->buildWhereColumns($id));
+	}
+
+	public function deleteById($table, $id){
+		return $this->deleteByColumns($table, $this->buildWhereColumns($id));
+	}
+/*
+
 	public function getByCustomQuery($query){
-		$sth = Store::$pdo->prepare($query . ';');
-		$sth->execute();
-		$result = $sth->fetchAll(PDO::FETCH_ASSOC);
-		return $result;
+		return $this->fetchFromQuery($query);
 	}
+*/
 
-	public function getByColumns($table, $columns, $combination = 'AND'){
-		$query = 'SELECT * FROM `wuersch`.`' . $table . '` WHERE ';
-		$keys = array_keys($columns);
-		foreach($keys as $key){
-			$query .= '`' . $key . '`=? ' . $combination . ' ';
-		}
-		$query = substr($query, 0, (-2-strlen($combination)));
-		$stmt = Store::$pdo->prepare($query . ';');
-		foreach($keys as $i=>$key)
-			$stmt->bindParam($i+1, $columns[$key]);
-		$stmt->execute();
-		return $stmt->fetchAll(PDO::FETCH_CLASS, ucfirst($table));
-	}
-
-	public function insert($table, $data){
-		if(!is_array($data))
-			return -1;
-		$keys = array_keys($data);
-		$query = 'INSERT INTO `wuersch`.`' . $table . '` (';
-		$query .= '`' . implode('`, `', $keys) . '`) VALUES (';
-
-		for($i=0; $i<count($data); $i++){
-			$query .= '?, ';
-		}
-		$query = substr($query, 0, -2) . ');';
-		$stmt = Store::$pdo->prepare($query);
-		foreach($keys as $i=>$key){
-			$stmt->bindParam($i+1, $data[$key]);
-		}
-		$result = $stmt->execute();
-		return Store::$pdo->lastInsertId();
-	}
-
-	public function update($table, $id, $data){
-		if(!is_array($data))
-			return false;
-		$keys = array_keys($data);
-		$columns = '';
-		$query = 'UPDATE `wuersch`.`' . $table . '` SET ';
-		foreach($keys as $key){
-			$query .= '`' . $key . '`=?, ';
-		}
-		$query = substr($query, 0, -2);
-		if(!is_numeric($id) && strlen($id)==32){
-			$query .= ' WHERE `id_md5`=?;';
-		}else{
-			$query .= ' WHERE `id`=?;';
-		}
-		$stmt = Store::$pdo->prepare($query);
-		foreach($keys as $i=>$key)
-			$stmt->bindParam($i+1, $data[$key]);
-		$stmt->bindParam(count($keys)+1, $id);
-		return $stmt->execute();
-	}
+	
 }
 
 ?>

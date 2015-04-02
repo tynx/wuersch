@@ -16,7 +16,7 @@ class WouldController extends BaseController{
 		$columns['time'] = time();
 		$columns['would'] = $would;
 		if(is_array($storedWould) && count($storedWould) === 1){
-			$this->getStore()->update('would', $storedWould[0]->id, $columns);
+			$this->getStore()->updateById('would', $storedWould[0]->id, $columns);
 			return $storedWould[0]->id;
 		}else{
 			return $this->getStore()->insert('would', $columns);

@@ -6,6 +6,7 @@ require_once('base/Backend.class.php');
 require_once('base/Request.class.php');
 require_once('base/Response.class.php');
 require_once('base/Store.class.php');
+require_once('base/StoreMysqlQuery.class.php');
 require_once('domain/User.class.php');
 require_once('domain/Picture.class.php');
 require_once('domain/Would.class.php');
