@@ -36,7 +36,7 @@ class UserController extends BaseController{
 			'register_time'=>time(),
 			'secret'=>$secret,
 		));
-		$this->getStore()->update('user', $id, array('id_md5'=>md5($id)));
+		$this->getStore()->updateById('user', $id, array('id_md5'=>md5($id)));
 		$this->addResponse('registration', array(
 				'id' => md5($id),
 				'authenticationURL' => 'http://localhost/wuersch/backend/auth/authenticate?idUser=' . md5($id),
@@ -52,7 +52,7 @@ class UserController extends BaseController{
 			$columns['interested_in_female'] = $this->postData['interestedInFemale'];
 		
 		if(count($columns) > 0)
-			$this->getStore()->update('user', $this->user->id, $columns);
+			$this->getStore()->updateById('user', $this->user->id, $columns);
 		$updatedUser = $this->getStore()->getById('user', $this->user->id);
 		$this->addResponse('user', $updatedUser->getPublicData());
 	}

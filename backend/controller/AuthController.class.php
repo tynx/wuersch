@@ -65,7 +65,7 @@ class AuthController extends BaseController{
 					'interested_in_female' => $isMale,
 					'authenticated_time'   => time(),
 				);
-				$this->getStore()->update('user', $id, $columns);
+				$this->getStore()->updateById('user', $id, $columns);
 				return;
 			} catch(FacebookRequestException $e) {
 				$this->error($e);
@@ -105,7 +105,7 @@ class AuthController extends BaseController{
 			if($i == 0)
 				$img['default'] = true;
 			$id = $this->getStore()->insert('picture', $img);
-			$this->getStore()->update('picture', $id, array('id_md5'=>md5($id)));
+			$this->getStore()->updateById('picture', $id, array('id_md5'=>md5($id)));
 			$curl->download($pic->source, WEBROOT . Config::$USER_PICTURES . md5($id) . '.jpg');
 			$picture = $this->getStore()->getById('picture', $id);
 			$this->addResponse('picture', $picture->getPublicData(), 'downloaded');
@@ -113,7 +113,7 @@ class AuthController extends BaseController{
 		$columns = array(
 			'fetch_time' => time(),
 		);
-		$this->getStore()->update('user', $this->user->id_md5, $columns);
+		$this->getStore()->updateById('user', $this->user->id_md5, $columns);
 	}
 
 	private function initFB(){

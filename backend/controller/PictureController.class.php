@@ -53,8 +53,8 @@ class PictureController extends BaseController{
 			return;
 		}
 
-		$this->getStore()->update('picture', $oldDefault->id, array('default'=>false));
-		$this->getStore()->update('picture', $newDefault->id, array('default'=>true));
+		$this->getStore()->updateById('picture', $oldDefault->id, array('default'=>false));
+		$this->getStore()->updateById('picture', $newDefault->id, array('default'=>true));
 		$columns = array('id_user'=>$this->user->id, 'id_md5'=>$idPicture);
 		$oldDefault = $this->getStore()->getById('picture', $oldDefault->id);
 		$newDefault = $this->getStore()->getById('picture', $newDefault->id);
