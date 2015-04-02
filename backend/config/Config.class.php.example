@@ -1,22 +1,21 @@
 <?php
 
 class Config{
-	public static $BASE_LOCATION = '/wuersch/';
-	public static $USER_PICTURES = '/tmp/assets/pictures/';
-	public static $ERROR_LOCATION = 'site/error';
+	const PDO_HOST = 'localhost';
+	const PDO_DATABASE = 'wuersch';
+	const PDO_USER = 'root';
+	const PDO_PASSWORD = '';
+	const PDO_CHARSET = 'utf8';
 
-	public static $PDO_HOST = 'localhost';
-	public static $PDO_DATABASE = 'wuersch';
-	public static $PDO_USER = '';
-	public static $PDO_PASSWORD = '';
-	public static $PDO_CHARSET = 'utf8';
+	const BASE_LOCATION = '/wuersch/';
+	const USER_PICTURES = '/tmp/assets/pictures/';
 
-	public static $FACEBOOK_APP_ID = '';
-	public static $FACEBOOK_APP_SECRET = '';
-	public static $FACEBOOK_APP_REDIRECT_URL = '';
-	public static $FACEBOOK_APP_SCOPES = '';
+	const FACEBOOK_APP_ID = '';
+	const FACEBOOK_APP_SECRET = '';
+	const FACEBOOK_APP_REDIRECT_URL = '';
+	const FACEBOOK_APP_SCOPES = '';
 
-	public static $AUTH_TIME_THRESHOLD = 5;
+	const AUTH_TIME_THRESHOLD = 5;
 }
 
 ?>

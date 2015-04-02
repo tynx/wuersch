@@ -1,7 +1,7 @@
 <?php
 
-class Would{
-	public function getPublicData(){
+class Would {
+	public function getPublicData() {
 		$store = new Store();
 		$userWould = $store->getById('user', $this->id_user_would);
 		$user = $store->getById('user', $this->id_user);
@@ -13,5 +13,3 @@ class Would{
 		);
 	}
 }
-
-?>
