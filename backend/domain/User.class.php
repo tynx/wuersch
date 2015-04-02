@@ -1,7 +1,7 @@
 <?php
 
-class User{
-	public function getPublicData(){
+class User {
+	public function getPublicData() {
 		return array(
 			'id'                 => $this->id_md5,
 			'name'               => $this->name,
@@ -13,5 +13,3 @@ class User{
 		);
 	}
 }
-
-?>

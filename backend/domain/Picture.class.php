@@ -1,7 +1,7 @@
 <?php
 
-class Picture{
-	public function getPublicData(){
+class Picture {
+	public function getPublicData() {
 		return array(
 			'id'        => $this->id_md5,
 			'isDefault' => (boolean)$this->default,
@@ -9,5 +9,3 @@ class Picture{
 		);
 	}
 }
-
-?>

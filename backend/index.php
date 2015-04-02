@@ -14,6 +14,3 @@ $response = $backend->getResponse();
 header('Content-Type: ' . $response->getContentType());
 echo $response->getBody();
 exit(0);
-
-
-?>

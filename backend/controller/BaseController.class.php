@@ -1,6 +1,6 @@
 <?php
 
-abstract class BaseController{
+abstract class BaseController {
 
 	protected $postData = array();
 	protected $request = null;
@@ -8,45 +8,44 @@ abstract class BaseController{
 	protected $user = null;
 	private $store = null;
 
-	public final function __construct(){
+	public final function __construct() {
 		$this->response = new Response();
 		$this->store = new Store();
 	}
 
 	public abstract function actionRequiresAuth($name);
 
-	public final function setRequest($request){
-		if($request->getHeaderField('Content-Type') === 'application/json'){
+	public final function setRequest($request) {
+		if ($request->getHeaderField('Content-Type') === 'application/json') {
 			$this->postData = json_decode($request->getPostData(), true);
 		}
 		$this->request = $request;
 	}
 
-	public final function setUser($user){
+	public final function setUser($user) {
 		$this->user = $user;
 	}
 
-	public final function getResponse(){
+	public final function getResponse() {
 		return $this->response;
 	}
 
-	protected final function getStore(){
+	protected final function getStore() {
 		return $this->store;
 	}
 
-	protected final function error($errorMessage){
+	protected final function error($errorMessage) {
 		$this->response->markAsError($errorMessage);
 	}
 
-	protected final function addResponse($type, $data, $additionalStatus = null){
+	protected final function addResponse($type, $data, $additionalStatus = null) {
 		$response = array(
-			'type' =>$type,
+			'type' => $type,
 			'data' => $data,
 		);
-		if($additionalStatus !== null)
+		if ($additionalStatus !== null) {
 			$response['additionalStatus'] = $additionalStatus;
+		}
 		$this->response->addResponse($response);
 	}
 }
-
-?>
