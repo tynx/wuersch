@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * This class is for handling all requests regarding users. It allows to
+ * register and make settings to an account. It provides an easy way
+ * to gather a random account (for client useful).  There is a method
+ * called debug, which dumps the current user. Be careful as this
+ * information may be cut due to the potential size of a users (in the
+ * sense of matches/woulds/picture). Also as it requests ALL the data of
+ * the user it should only be used for debugging. For all the
+ * information there is an appropriate action/method in the according
+ * controller.
+ * @author Tim Luginbühl (tynx)
+ */
 class UserController extends BaseController {
 
 	/**
@@ -15,7 +27,19 @@ class UserController extends BaseController {
 		return true;
 	}
 
+	/**
+	 * This method returns the information of the current user.
+	 */
 	public function actionCurrent() {
+		$this->addResponse('user', $this->user->getPublicData());
+	}
+
+	/**
+	 * This method is only for debugging! Do NOT use it on a regular
+	 * basis!
+	 * Returns everything of a user.
+	 */
+	public function actionDebug() {
 		$this->addResponse('user', $this->user->getPublicData());
 
 		$pictures = $this->getStore()->getByColumns(
@@ -44,6 +68,12 @@ class UserController extends BaseController {
 		}
 	}
 
+	/**
+	 * This method is for registering a new user. You have to provide a
+	 * secret for the HMAC-Auth. Make sure u implement a good
+	 * randomness!
+	 * @param secret the secret of the client
+	 */
 	public function actionRegister($secret) {
 		$id = $this->getStore()->insert('user', array(
 			'register_time' => time(),
@@ -52,11 +82,15 @@ class UserController extends BaseController {
 		$this->getStore()->updateById('user', $id, array('id_md5' => md5($id)));
 		$this->addResponse('registration', array(
 				'id'                => md5($id),
-				'authenticationURL' => 'http://localhost/wuersch/backend/auth/authenticate?idUser=' . md5($id),
+				'authenticationURL' => Config::FACEBOOK_APP_AUTH_URL . '?idUser=' . md5($id),
 			)
 		);
 	}
 
+	/**
+	 * This method allows the set the settings of a user. Currently only
+	 * what choices of gender is supported and needed.
+	 */
 	public function actionSettings() {
 		$columns = array();
 		if (isset($this->postData['interestedInMale'])) {
@@ -73,6 +107,9 @@ class UserController extends BaseController {
 		$this->addResponse('user', $updatedUser->getPublicData());
 	}
 
+	/**
+	 * This method returns a random user of interest.
+	 */
 	public function actionRandom() {
 		$query = 'SELECT `user`.`id` FROM `wuersch`.`user` WHERE NOT EXISTS';
 		$query .= '(SELECT `would`.`id_user_would` FROM `wuersch`.`would` ';

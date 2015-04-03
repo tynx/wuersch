@@ -29,6 +29,11 @@ class AuthController extends BaseController {
 		return false;
 	}
 
+	/**
+	 * This method should be called by any method/action if they use the
+	 * FB-SDK. Iit sets up the FacebookSessoin with the app id and
+	 * secret.
+	 */
 	private function _initFB() {
 		FacebookSession::setDefaultApplication(
 			Config::FACEBOOK_APP_ID,
@@ -39,6 +44,7 @@ class AuthController extends BaseController {
 	/**
 	 * First authentication step. Builds session-based FB-login and
 	 * redirects to fb for approval of the user.
+	 * @param idUser the user id to be authenticated
 	 */
 	public function actionAuthenticate($idUser) {
 		$this->_initFB();
@@ -56,6 +62,12 @@ class AuthController extends BaseController {
 		exit(0);
 	}
 
+	/**
+	 * This method/action is called/redirected by facebook. Here is the
+	 * first time we can fetch information about the user via the FB
+	 * Graph-API. We do so for gathering the very basic information
+	 * about the newly created user.
+	 */
 	public function actionCallback() {
 		$this->_initFB();
 		$id = $_SESSION['wuersch_registration_user_id'];
@@ -104,7 +116,12 @@ class AuthController extends BaseController {
 		$this->error('Was this URL called by Facebook or yourself?!');
 	}
 
-
+	/**
+	 * This method fetches all the uploaded pictures of the user. Take
+	 * note: This may take some time (depending on how many photos and
+	 * size of the user). Also internet-conectivity is an influence on
+	 * runtime of this method.
+	 */
 	public function actionFetch() {
 		$this->_initFB();
 		$session = new FacebookSession($this->user->fb_access_token);

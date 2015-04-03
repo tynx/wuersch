@@ -51,5 +51,5 @@ if($argv[1]=='settings'){
 }
 
 var_dump($curl->response);
-echo json_encode($curl->response);
+echo "\n";
 ?>

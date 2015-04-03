@@ -186,6 +186,7 @@ class Request {
 		if (count($parts) !== 2) {
 			return;
 		}
+		
 		$store = new Store();
 		$user = $store->getById('user', $parts[0]);
 		if ($user === null) {

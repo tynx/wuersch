@@ -57,3 +57,23 @@ ALTER TABLE `wuersch`.`would` ADD CONSTRAINT `fk_would_user2` FOREIGN KEY (`id_u
 ALTER TABLE `wuersch`.`picture` ADD CONSTRAINT `fk_picture_user` FOREIGN KEY (`id_user`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE `wuersch`.`match` ADD CONSTRAINT `fk_match_user1` FOREIGN KEY (`id_user_1`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE `wuersch`.`match` ADD CONSTRAINT `fk_match_user2` FOREIGN KEY (`id_user_2`) REFERENCES `wuersch`.`user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- LOGGING
+
+CREATE TABLE `wuersch`.`log_request`(
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_user` INT NULL,
+  `time` BIGINT NOT NULL DEFAULT 0,
+  `scope` VARCHAR(2048) NULL
+) ENGINE = InnoDB
+  DEFAULT CHARACTER SET UTF8
+  COLLATE utf8_general_ci;
+
+CREATE TABLE `wuersch`.`log_argument`(
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_request` INT NOT NULL,
+  `key` VARCHAR(2048) NULL,
+  `value` VARCHAR(10240) NULL
+) ENGINE = InnoDB
+  DEFAULT CHARACTER SET UTF8
+  COLLATE utf8_general_ci;

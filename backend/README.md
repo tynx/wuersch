@@ -1,4 +1,4 @@
-# Wuersch - REST Backen
+# Wuersch - REST Backend
 
 ###### Features
  - HMAC-based Auth ([See wiki](http://en.wikipedia.org/wiki/Hash-based_message_authentication_code))
@@ -75,6 +75,7 @@ The **Match** object
 | match      | get          | yes           | GET    | None      | None      |
 | picture    | None         | yes           | GET    | idUser    | None      |
 | picture    | get          | yes           | GET    | None      | None      |
+| picture    | own          | yes           | GET    | idPicture | None      |
 | picture    | default      | yes           | GET    | idPicture | None      |
 | user       | register     | no            | GET    | secret    | None      |
 | user       | current      | yes           | GET    | None      | None      |
@@ -95,6 +96,8 @@ The **Match** object
   - This returns the image of a user based on given idUser.
 - picture/get
   - Returns all the pictures of the current user, which have been downloaded previousely.
+- picture/own
+  - Shows own image based on given idPicture
 - picture/default
   - Sets a picture as the default
 - user/register
@@ -105,6 +108,7 @@ The **Match** object
   - This returns a random user of interesset (based on gender). This is not yet very well implemented, but it works and for the current use it's fine.
 - user/settings
   - This allows to set the settings. Mainly: what the user is interested in (gender) and profile pictrue. This has to be fully implemented!
+  - POST-data: JSON: {interestedInMale:true,interestedInFemale:true}
 - would
   - This will mark that the user would do the other user (provided by idUser)
 - would/not

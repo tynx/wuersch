@@ -72,15 +72,13 @@ class Store {
 	}
 
 	/**
-	 * This methods binds the provided params to the pdo-statement.
-	 * valueColumns have prefix :v (as in (V)alues) and whereColumns
-	 * have prefix :w (as in (W)here).
+	 * This method prepares an sql and binds all the whereColumns and
+	 * valueColumns if provided.
+	 * @param sql the sql to prepare
+	 * @param whereColumns the conditions to bind
+	 * @param valueColumns the values to bind
 	 */
-	private function _bindParams($statement, $whereColumns, $valueColumns) {
-		
-	}
-
-	private function _prepare($sql, $whereColumns = null, $valueColumns = null){
+	private function _prepare($sql, $whereColumns = null, $valueColumns = null) {
 		$this->statement = Store::$pdo->prepare($sql);
 		if ($whereColumns !== null && is_array($whereColumns)) {
 			foreach ($whereColumns as $key => $value) {
@@ -100,7 +98,20 @@ class Store {
 		}
 	}
 
+	/**
+	 * This method executes a prepared statement. So do NOT call this
+	 * method before calling _prepare. It then (if needed) fetches the
+	 * result and stores it in statementResult.
+	 * @param fetch should a fetch happen (only select)
+	 * @param fetchClass if fetching is activated, the class to fetch
+	 * in. if none provided and fetch activated it will fetch as assoc-
+	 * array
+	 * @return true if the execute was a success, otherwise false
+	 */
 	private function _execute($fetch = false, $fetchClass = null) {
+		if ($this->statement === null) {
+			return false;
+		}
 		if (!$this->statement->execute()) {
 			return false;
 		}
@@ -118,6 +129,7 @@ class Store {
 		} else {
 			$this->statementResult = $this->statement->fetchAll(PDO::FETCH_CLASS, $fetchClass);
 		}
+		$this->statement = null;
 		return true;
 	}
 
@@ -245,9 +257,21 @@ class Store {
 		return $this->deleteByColumns($table, $this->_buildWhereColumns($id));
 	}
 
-	public function getByCustomQuery($sql, $whereColumns = null){
-		$this->_prepare($sql, $whereColumns);
-		if($this->_execute(true)){
+	/**
+	 * This is a very direct way to communicate with the db. It is for
+	 * when the other methods are not enough customizable. But you are
+	 * in charge of making the security as high as possible! think of
+	 * injections! never trust any input! ANY!
+	 * @param sql the query to run
+	 * @param whereColumns if you have set up params you can provide the
+	 * columns for a proper bind. Increases security!
+	 * @param valueColumns if you have set up params you can provide the
+	 * columns for a proper bind. Increases security!
+	 * @return the fetches result as assoc-array.
+	 */
+	public function getByCustomQuery($sql, $whereColumns = null, $valueColumns = null) {
+		$this->_prepare($sql, $whereColumns, $valueColumns);
+		if ($this->_execute(true)) {
 			return $this->statementResult;
 		}
 		return null;
