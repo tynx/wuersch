@@ -13,6 +13,11 @@ abstract class BaseController {
 		$this->store = new Store();
 	}
 
+	/**
+	 * Which methods need an HMAC-Authenticatoin
+	 * @param name the name of the method which needs auth
+	 * @return true if the method needs a valid user
+	 */
 	public abstract function actionRequiresAuth($name);
 
 	public final function setRequest($request) {

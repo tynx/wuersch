@@ -7,11 +7,21 @@ use Facebook\GraphUser;
 use Facebook\FacebookRequestException;
 
 /**
- * 
-* @author Tim Luginbühl (tynx)
+ * This class handles to whole Facebook-Integration. Three actions:
+ * authenticate (which redirects to facebook)
+ * callback (which should NOT be called. this is called/redirect by/from
+ * facebook)
+ * fetch (downloads the FB-pictures of the user)
+ * @author Tim Luginbühl (tynx)
  */
 class AuthController extends BaseController {
 
+	/**
+	 * Which methods need an HMAC-Authentication
+	 * in this class: only fetch
+	 * @param name the name of the method which needs auth
+	 * @return true if the method needs a valid user
+	 */
 	public function actionRequiresAuth($name) {
 		if ($name === 'actionFetch') {
 			return true;
@@ -19,6 +29,17 @@ class AuthController extends BaseController {
 		return false;
 	}
 
+	private function _initFB() {
+		FacebookSession::setDefaultApplication(
+			Config::FACEBOOK_APP_ID,
+			Config::FACEBOOK_APP_SECRET
+		);
+	}
+
+	/**
+	 * First authentication step. Builds session-based FB-login and
+	 * redirects to fb for approval of the user.
+	 */
 	public function actionAuthenticate($idUser) {
 		$this->_initFB();
 		$user = $this->getStore()->getById('user', $idUser);
@@ -127,12 +148,5 @@ class AuthController extends BaseController {
 			'fetch_time' => time(),
 		);
 		$this->getStore()->updateById('user', $this->user->id_md5, $columns);
-	}
-
-	private function _initFB() {
-		FacebookSession::setDefaultApplication(
-			Config::FACEBOOK_APP_ID,
-			Config::FACEBOOK_APP_SECRET
-		);
 	}
 }

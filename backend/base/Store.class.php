@@ -17,6 +17,8 @@ class Store {
 	 */
 	private static $query = null;
 
+	private $statement = null;
+
 	/**
 	 * The results are temporary stored in here
 	 */
@@ -75,9 +77,14 @@ class Store {
 	 * have prefix :w (as in (W)here).
 	 */
 	private function _bindParams($statement, $whereColumns, $valueColumns) {
+		
+	}
+
+	private function _prepare($sql, $whereColumns = null, $valueColumns = null){
+		$this->statement = Store::$pdo->prepare($sql);
 		if ($whereColumns !== null && is_array($whereColumns)) {
 			foreach ($whereColumns as $key => $value) {
-				$statement->bindValue(
+				$this->statement->bindValue(
 					StoreMysqlQuery::PARAM_PREFIX . 'w' . $key,
 					$value
 				);
@@ -85,7 +92,7 @@ class Store {
 		}
 		if ($valueColumns !== null && is_array($valueColumns)) {
 			foreach ($valueColumns as $key => $value) {
-				$statement->bindValue(
+				$this->statement->bindValue(
 					StoreMysqlQuery::PARAM_PREFIX . 'v' . $key,
 					$value
 				);
@@ -93,25 +100,23 @@ class Store {
 		}
 	}
 
-	private function _execute($sql, $whereColumns = null, $valueColumns = null, $fetch = false, $fetchClass = null) {
-		$statement = Store::$pdo->prepare($sql);
-		$this->_bindParams($statement, $whereColumns, $valueColumns);
-		if (!$statement->execute()) {
+	private function _execute($fetch = false, $fetchClass = null) {
+		if (!$this->statement->execute()) {
 			return false;
 		}
-		if (!$fetch && $statement->rowCount() > 1) {
+		if (!$fetch && $this->statement->rowCount() > 1) {
 			$this->statementResult = true;
 		} elseif (!$fetch) {
 			$this->statementResult = (int)Store::$pdo->lastInsertId();
-			if ($this->statementResult === 0 && $statement->rowCount() === 1) {
+			if ($this->statementResult === 0 && $this->statement->rowCount() === 1) {
 				$this->statementResult = true;
-			} elseif ($this->statementResult === 0 && $statement->rowCount() === 0) {
+			} elseif ($this->statementResult === 0 && $this->statement->rowCount() === 0) {
 				$this->statementResult = false;
 			}
 		} elseif ($fetchClass === null) {
-			$this->statementResult = $statement->fetchAll(PDO::FETCH_ASSOC);
+			$this->statementResult = $this->statement->fetchAll(PDO::FETCH_ASSOC);
 		} else {
-			$this->statementResult = $statement->fetchAll(PDO::FETCH_CLASS, $fetchClass);
+			$this->statementResult = $this->statement->fetchAll(PDO::FETCH_CLASS, $fetchClass);
 		}
 		return true;
 	}
@@ -129,10 +134,12 @@ class Store {
 	 */
 	public function getByColumns($table, $whereColumns, $combination = 'AND') {
 		$sql = Store::$query->getSelectSql($table, $whereColumns, $combination);
+		$class = null;
 		if (class_exists(ucfirst($table), false)) {
 			$class = ucfirst($table);
 		}
-		if ($this->_execute($sql, $whereColumns, null, true, $class)) {
+		$this->_prepare($sql, $whereColumns);
+		if ($this->_execute(true, $class)) {
 			return $this->statementResult;
 		}
 		return null;
@@ -149,7 +156,8 @@ class Store {
 			return -1;
 		}
 		$sql = Store::$query->getInsertSql($table, $valueColumns);
-		if ($this->_execute($sql, null, $valueColumns)) {
+		$this->_prepare($sql, null, $valueColumns);
+		if ($this->_execute()) {
 			return $this->statementResult;
 		}
 		return -1;
@@ -174,7 +182,8 @@ class Store {
 			return false;
 		}
 		$sql = Store::$query->getUpdateSql($table, $valueColumns, $whereColumns, $combination);
-		if ($this->_execute($sql, $whereColumns, $valueColumns)) {
+		$this->_prepare($sql, $whereColumns, $valueColumns);
+		if ($this->_execute()) {
 			return $this->statementResult;
 		}
 		return false;
@@ -192,7 +201,8 @@ class Store {
 	 */
 	public function deleteByColumns($table, $whereColumns, $combination = 'AND') {
 		$sql = Store::$query->getDeleteSql($table, $whereColumns, $combination);
-		if ($this->_execute($sql, $whereColumns, null)) {
+		$this->_prepare($sql, $whereColumns);
+		if ($this->_execute()) {
 			return $this->statementResult;
 		}
 		return false;
@@ -233,5 +243,13 @@ class Store {
 	 */
 	public function deleteById($table, $id) {
 		return $this->deleteByColumns($table, $this->_buildWhereColumns($id));
+	}
+
+	public function getByCustomQuery($sql, $whereColumns = null){
+		$this->_prepare($sql, $whereColumns);
+		if($this->_execute(true)){
+			return $this->statementResult;
+		}
+		return null;
 	}
 }

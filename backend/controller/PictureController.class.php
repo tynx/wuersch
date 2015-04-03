@@ -2,6 +2,12 @@
 
 class PictureController extends BaseController {
 
+	/**
+	 * Which methods need an HMAC-Authentication
+	 * in this class: all
+	 * @param name the name of the method which needs auth
+	 * @return true if the method needs a valid user
+	 */
 	public function actionRequiresAuth($name) {
 		return true;
 	}
