@@ -79,6 +79,7 @@ class Backend {
 
 	/**
 	 * Sets an error-response
+	 * @param errorMessage the message to send to the client
 	 */
 	private function _setError($errorMessage) {
 		$this->response = new Response();
@@ -87,6 +88,7 @@ class Backend {
 
 	/**
 	 * Returns the generated response
+	 * @return the response-object to send back to the client
 	 */
 	public function getResponse() {
 		return $this->response;

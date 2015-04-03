@@ -1,12 +1,32 @@
 <?php
 
+/**
+ * This class builds mysql queries. The motivation is to keep it as
+ * generic as possible, so other implementations (like sqlite) could be
+ * implemented. The current status is to believed basically as
+ * interface, meaning all the needed feature are covered regardless
+ * the implementation. Of course NoSQL-stuff would not be compatible
+ * 100% and would need a lot of adaption. But definetaly not scope of
+ * this project.
+ * @author Tim Luginbühl (tynx)
+ */
 class StoreMysqlQuery {
+
+	/**
+	 * The default limit for security/performance reasons pretty low.
+	 */
 	const DEFAULT_LIMIT = 100;
+
+	/**
+	 * pdo-param preffix. for binding params
+	 */
 	const PARAM_PREFIX = ':';
 
+	/**
+	 * the name of the db which is added to the query.
+	 */
 	private $db = null;
 
-	private $queryParts = array();
 
 	public function __construct($db) {
 		$this->db = $db;
@@ -97,7 +117,7 @@ class StoreMysqlQuery {
 			$sql .= $this->buildWhere($whereColumns, $combination) . ' ';
 		}
 		$sql .= $this->buildLimit();
-		return $sql;
+		return $sql . ';';
 	}
 
 	public function getInsertSql($table, $valueColumns) {
@@ -106,7 +126,7 @@ class StoreMysqlQuery {
 			$sql .= $this->buildColumnList($valueColumns) . ' ';
 			$sql .= $this->buildValueList($valueColumns) . ' ';
 		}
-		return $sql;
+		return $sql . ';';
 	}
 
 	public function getUpdateSql($table, $valueColumns, $whereColumns, $combination = 'AND') {
@@ -117,7 +137,7 @@ class StoreMysqlQuery {
 		if ($whereColumns !== null && is_array($whereColumns)) {
 			$sql .= $this->buildWhere($whereColumns, $combination) . ' ';
 		}
-		return $sql;
+		return $sql . ';';
 	}
 
 	public function getDeleteSql($table, $whereColumns, $combination = 'AND') {
@@ -125,6 +145,6 @@ class StoreMysqlQuery {
 		if ($whereColumns !== null && is_array($whereColumns)) {
 			$sql .= $this->buildWhere($whereColumns, $combination) . ' ';
 		}
-		return $sql;
+		return $sql . ';';
 	}
 }

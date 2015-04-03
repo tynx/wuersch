@@ -2,6 +2,7 @@
 
 /**
  * This class represents an HTTP-Request to the backend.
+ * @author Tim Luginbühl (tynx)
  */
 class Request {
 
@@ -56,27 +57,122 @@ class Request {
 	 */
 	private $user = null;
 
+	/**
+	 * This is the constructor which just parses the current request
+	 * from the global vars and tries to authenticate automatically.
+	 */
 	public function __construct() {
 		$this->_parse();
-		$this->authenticate();
+		$this->_authenticate();
 	}
 
+	/**
+	 * Returns true if the current request is valid
+	 * @return true if valid request
+	 */
 	public function isValid() {
 		return $this->valid;
 	}
 
+	/**
+	 * Returns true if the current request is authenticated and login
+	 * was successful.
+	 * @return true if the request was successfully authenticated
+	 */
 	public function isAuthenticated() {
 		return $this->authenticated;
 	}
 
+	/**
+	 * Returns the authenticated user if the authentication was
+	 * successful
+	 * @return the user authenticated and if non-existent null
+	 */
 	public function getAuthenticatedUser() {
-		if ($this->authenticated) {
+		if ($this->isAuthenticated()) {
 			return $this->user;
 		}
 		return null;
 	}
 
-	private function authenticate() {
+	/**
+	 * Returns the method of the request
+	 * @return the method of the request
+	 */
+	public function getMethod() {
+		return $this->method;
+	}
+
+	/**
+	 * Returns the controller which should be called.
+	 * @return formatted Controller-name
+	 */
+	public function getControllerName() {
+		return ucFirst($this->controller) . 'Controller';
+	}
+
+	/**
+	 * Returns the action which should be called within the controller
+	 * @return formatted Action-name
+	 */
+	public function getActionName() {
+		return 'action' . ucFirst($this->action);
+	}
+
+	/**
+	 * Returns the get-argument provided by key.
+	 * @param name the key of the get-argument
+	 * @return the value of the GET-Argument or null if non-existent.
+	 */
+	public function getArgument($name) {
+		if (isset($this->arguments[$name]) &&
+			!empty($this->arguments[$name])) {
+			return $this->arguments[$name];
+		}
+		return null;
+	}
+
+	/**
+	 * Returns true if the request has the header-field set.
+	 * @param name the name of the header field
+	 * @return true if header-field exists otherwise false
+	 */
+	public function hasHeaderField($name) {
+		if (isset($this->headers[$name])) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns the header field
+	 * @param name the name of the header field
+	 * @return the header field or null if not found
+	 */
+	public function getHeaderField($name) {
+		if ($this->hasHeaderField($name)) {
+			return $this->headers[$name];
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the unparsed POST-data (body of post-request).
+	 * @return the body of POST-request
+	 */
+	public function getPostData() {
+		return $this->post;
+	}
+
+	/**
+	 * Authenticates the user based on the header fields provided.
+	 * It is HMAC-based with following format:
+	 * _GET_
+	 * sha1_hmac($time . "\nget\nuser/current\n" . md5(null) . "\n")
+	 * _POST_
+	 * sha1_hmac($time . "\npost\nuser/settings\n" . md5($body) . "\n")
+	 */
+	private function _authenticate() {
 		if (!$this->hasHeaderField('hmac')) {
 			return;
 		}
@@ -111,44 +207,14 @@ class Request {
 		}
 	}
 
-	public function getMethod() {
-		return $this->method;
-	}
-
-	public function getControllerName() {
-		return ucFirst($this->controller) . 'Controller';
-	}
-
-	public function getActionName() {
-		return 'action' . ucFirst($this->action);
-	}
-
-	public function getArgument($name) {
-		if (isset($this->arguments[$name]) &&
-			!empty($this->arguments[$name])) {
-			return $this->arguments[$name];
-		}
-		return null;
-	}
-
-	public function hasHeaderField($name) {
-		if (isset($this->headers[$name])) {
-			return true;
-		}
-		return false;
-	}
-
-	public function getHeaderField($name) {
-		if ($this->hasHeaderField($name)) {
-			return $this->headers[$name];
-		}
-		return null;
-	}
-
-	public function getPostData() {
-		return $this->post;
-	}
-
+	/**
+	 * This method parses various things provided by the global vars
+	 * like $_SERVER, $_GET and so on. It tries to get following
+	 * information:
+	 * controller (xxx/) and action (/yyy) from the structure (xxx/yyy)
+	 * header-fields and authentication
+	 * get-arguments and post-body
+	 */
 	private function _parse() {
 		$this->method = strtolower($_SERVER['REQUEST_METHOD']);
 		$this->path = str_replace(Config::BASE_LOCATION, '', $_SERVER['REQUEST_URI']);

@@ -6,6 +6,10 @@ use Facebook\FacebookRedirectLoginHelper;
 use Facebook\GraphUser;
 use Facebook\FacebookRequestException;
 
+/**
+ * 
+* @author Tim Luginbühl (tynx)
+ */
 class AuthController extends BaseController {
 
 	public function actionRequiresAuth($name) {
