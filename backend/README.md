@@ -79,6 +79,7 @@ The **Match** object
 | picture    | default      | yes           | GET    | idPicture | None      |
 | user       | register     | no            | GET    | secret    | None      |
 | user       | current      | yes           | GET    | None      | None      |
+| user       | debug        | yes           | GET    | None      | None      |
 | user       | random       | yes           | GET    | None      | None      |
 | user       | settings     | yes           | POST   | None      | Settings  |
 | would      | None         | yes           | GET    | idUser    | None      |
@@ -102,8 +103,10 @@ The **Match** object
   - Sets a picture as the default
 - user/register
   - Registers a user. Make sure you generate a good secret (some real randomness). You will get instruction about what to do with the created user (e.g. open URL in browser/webview). 
+- user/debug
+  - Only for debugging used: Returns the authenticated user and all its data
 - user/current
-  - Probably just for debugging used: Returns the authenticated user
+  - Returns the public data of the authenticated user
 - user/random
   - This returns a random user of interesset (based on gender). This is not yet very well implemented, but it works and for the current use it's fine.
 - user/settings
