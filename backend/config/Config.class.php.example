@@ -1,6 +1,14 @@
 <?php
 
 class Config{
+
+	const LOG_FILE = '/var/log/wuersch.log';
+	const LOG_DATE_FORMAT = 'd-m-Y H:i:s';
+	const LOG_ERROR = true;
+	const LOG_WARNING = true;
+	const LOG_INFO = true;
+	const LOG_DEBUG = true;
+
 	const PDO_HOST = 'localhost';
 	const PDO_DATABASE = 'wuersch';
 	const PDO_USER = 'root';

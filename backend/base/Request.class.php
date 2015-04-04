@@ -238,7 +238,8 @@ class Request {
 	 */
 	private function _parse() {
 		$this->method = strtolower($_SERVER['REQUEST_METHOD']);
-		$this->path = str_replace(Config::BASE_LOCATION, '', $_SERVER['REQUEST_URI']);
+		$regex = '/' . str_replace('/', '\/', Config::BASE_LOCATION) . '/';
+		$this->path = preg_replace($regex, '', $_SERVER['REQUEST_URI'], 1);
 		$request = explode('?', strtolower($this->path))[0];
 		if (!empty($request)) {
 			$parts = explode('/', $request);
