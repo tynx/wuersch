@@ -32,6 +32,7 @@ class MatchController extends BaseController {
 	public function actionIs($idUser) {
 		$otherUser = $this->getStore()->getById('user', $idUser);
 		if ($otherUser === null) {
+			$this->getLogger()->warning('Other user not found: ' . $idUser);
 			$this->error('Provided user not found!');
 			return;
 		}

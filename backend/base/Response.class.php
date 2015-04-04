@@ -7,6 +7,11 @@
 class Response {
 
 	/**
+	 * Instance of the logger for log-messages
+	 */
+	private $logger = null;
+
+	/**
 	 * All the different response-objects are stored in here
 	 */
 	private $responses = array();
@@ -30,6 +35,7 @@ class Response {
 	 * The constructor sets default values
 	 */
 	public function __construct() {
+		$this->logger = new Logger();
 		$this->status = 'OK';
 		$this->statusMessage = 'All good.';
 		$this->contentType = 'application/json';
@@ -49,6 +55,7 @@ class Response {
 	 * @return string of the response
 	 */
 	public function getBody() {
+		$this->logger->debug('Returning response with ' . count($this->responses) . ' subResponses');
 		$arr = array(
 			'status'        => $this->status,
 			'statusMessage' => $this->statusMessage,

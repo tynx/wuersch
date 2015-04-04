@@ -40,6 +40,7 @@ class WouldController extends BaseController {
 		$columns['time'] = time();
 		$columns['would'] = $would;
 		if (is_array($storedWould) && count($storedWould) === 1) {
+			$this->getLogger()->info('Setting would (' . (($would) ? 'yes' : 'no') . ') otherUser:' . $idUser);
 			$this->getStore()->updateById(
 				'would',
 				$storedWould[0]->id,
@@ -47,6 +48,7 @@ class WouldController extends BaseController {
 			);
 			return $storedWould[0]->id;
 		} else {
+			$this->getLogger()->info('Adding would (' . (($would) ? 'yes' : 'no') . ') otherUser:' . $idUser);
 			return $this->getStore()->insert('would', $columns);
 		}
 	}
@@ -59,6 +61,7 @@ class WouldController extends BaseController {
 	public function actionIndex($idUser) {
 		$otherUser = $this->getStore()->getById('user', $idUser);
 		if ($otherUser === null) {
+			$this->getLogger()->warning('other user not found: ' . $idUser);
 			$this->error('User was not found.');
 		}
 		$id = $this->_storeWould($this->user->id, $otherUser->id);
@@ -88,6 +91,7 @@ class WouldController extends BaseController {
 	public function actionNot($idUser) {
 		$otherUser = $this->getStore()->getById('user', $idUser);
 		if ($otherUser === null) {
+			$this->getLogger()->warning('other user not found: ' . $idUser);
 			$this->error('User was not found.');
 		}
 		$id = $this->_storeWould($this->user->id, $otherUser->id, false);

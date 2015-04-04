@@ -33,6 +33,7 @@ class PictureController extends BaseController {
 	public function actionIndex($idUser) {
 		$user = $this->getStore()->getById('user', $idUser);
 		if ($user === null) {
+			$this->getLogger()->warning('User not found: ' . $idUser);
 			$this->error('Provided user not found!');
 			return;
 		}
@@ -42,6 +43,7 @@ class PictureController extends BaseController {
 		);
 		$picture = $this->getStore()->getByColumns('picture', $columns);
 		if (!is_array($picture) || count($picture) !== 1) {
+			$this->getLogger()->error('Default picture not found of user: ' . $idUser);
 			$this->error('No picture found!');
 			return;
 		}
@@ -64,6 +66,7 @@ class PictureController extends BaseController {
 		);
 		$pictures = $this->getStore()->getByColumns('picture', $columns);
 		if (!is_array($pictures) || count($pictures) !== 1) {
+			$this->getLogger()->warning('Requested picture not found: ' . $idPicture);
 			$this->error('No valid picture found!');
 			return;
 		}
@@ -95,6 +98,7 @@ class PictureController extends BaseController {
 		);
 		$oldDefault = $this->getStore()->getByColumns('picture', $columns);
 		if (!is_array($oldDefault) && count($oldDefault) !== 1) {
+			$this->getLogger()->error('No current default picture found!');
 			$this->error('Error while finding default picture!');
 			return;
 		}
@@ -106,6 +110,7 @@ class PictureController extends BaseController {
 
 		$newDefault = $this->getStore()->getById('picture', $idPicture);
 		if ($newDefault === null || $newDefault->id_user !== $this->user->id) {
+			$this->getLogger()->warning('new default pictureId is invalid.');
 			$this->error('Not a valid picture ID provided!');
 			return;
 		}
@@ -124,6 +129,7 @@ class PictureController extends BaseController {
 			'id_user' => $this->user->id,
 			'id_md5' => $idPicture
 		);
+
 		$oldDefault = $this->getStore()->getById('picture', $oldDefault->id);
 		$newDefault = $this->getStore()->getById('picture', $newDefault->id);
 		$this->addResponse('picture', $newDefault->getPublicData(), 'new default');

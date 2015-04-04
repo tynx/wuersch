@@ -36,6 +36,11 @@ abstract class BaseController {
 	private $store = null;
 
 	/**
+	 * The instance of the logger all subControllers should use.
+	 */
+	private $logger = null;
+
+	/**
 	 * The constructor initializes the response and the store for all
 	 * it's subclasses.
 	 */
@@ -61,6 +66,24 @@ abstract class BaseController {
 			$this->postData = json_decode($request->getPostData(), true);
 		}
 		$this->request = $request;
+	}
+
+	/**
+	 * This method is for setting the instance of the logger which the
+	 * all the controllers should use within this request.
+	 * @param logger the logger-instance to use
+	 */
+	public final function setLogger($logger) {
+		$this->logger = $logger;
+	}
+
+	/**
+	 * Returns the instance of the logger which all controllers should
+	 * use.
+	 * @return the instance of the logger to use
+	 */
+	protected final function getLogger() {
+		return $this->logger;
 	}
 
 	/**

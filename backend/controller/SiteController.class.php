@@ -27,6 +27,7 @@ class SiteController extends BaseController {
 	 * make anything out of it.
 	 */
 	public function actionIndex() {
+		$this->getLogger()->info('Probably just empty request. Sending error to client.');
 		$this->error('Provide controller/action! Invalid request!');
 	}
 }

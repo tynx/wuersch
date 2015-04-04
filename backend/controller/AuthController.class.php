@@ -50,14 +50,17 @@ class AuthController extends BaseController {
 		$this->_initFB();
 		$user = $this->getStore()->getById('user', $idUser);
 		if ($user === null) {
+			$this->getLogger()->warning('Authentication failed. User not found: ' . $idUser);
 			$this->error('User not found.');
 		}
 		if ($user->authenticated_time > 0) {
+			$this->getLogger()->warning('Authentication failed. Already authenticated, user: ' . $idUser);
 			$this->error('Already authenticated.');
 		}
 		$_SESSION['wuersch_registration_user_id'] = $idUser;
 		$helper = new FacebookRedirectLoginHelper(Config::FACEBOOK_APP_REDIRECT_URL);
 		$loginUrl = $helper->getLoginUrl(array('scope' => Config::FACEBOOK_APP_SCOPES));
+		$this->getLogger()->debug('Redirecting user to FB: ' . $idUser);
 		header('Location: ' . $loginUrl);
 		exit(0);
 	}
@@ -73,10 +76,12 @@ class AuthController extends BaseController {
 		$id = $_SESSION['wuersch_registration_user_id'];
 		$user = $this->getStore()->getById('user', $id);
 		if ($user === null) {
+			$this->getLogger()->error('Callback user not found! Shouldn\'t happen!! user: ' . $id);
 			$this->error('user was not found!');
 			return;
 		}
 		if ($user->authenticated_time > 0) {
+			$this->getLogger()->warning('Callback failed. Already authenticated, user: ' . $id);
 			$this->error('this user was already authenticated!');
 			return;
 		}
@@ -84,10 +89,12 @@ class AuthController extends BaseController {
 		try {
 			$session = $helper->getSessionFromRedirect();
 		} catch (FacebookRequestException $ex) {
-			$this->error($e->toString());
+			$this->getLogger()->error('FBRequestException for RedirectLogin!');
+			$this->error($e);
 			return;
 		} catch (\Exception $ex) {
-			$this->error($e->toString());
+			$this->getLogger()->error('Exception in FB SDK!');
+			$this->error($e);
 			return;
 		}
 		if ($session) {
@@ -109,10 +116,12 @@ class AuthController extends BaseController {
 				$this->getStore()->updateById('user', $id, $columns);
 				return;
 			} catch (FacebookRequestException $e) {
+				$this->getLogger()->error('FBRequestException for GET /me!');
 				$this->error($e);
 				return;
 			}  
 		}
+		$this->getLogger()->warning('Not processable callback-request. Seding error to client!');
 		$this->error('Was this URL called by Facebook or yourself?!');
 	}
 
@@ -129,12 +138,14 @@ class AuthController extends BaseController {
 			$request = new FacebookRequest($session, 'GET', '/me/photos/uploaded');
 			$graph = $request->execute()->getGraphObject();
 		} catch (Exception $ex) {
+			$this->getLogger()->error('FBRequestException for GET /me/photos/uploaded!');
 			$this->error('Couldn\'t access Facebook Graph API.');
 			return;
 		}
 		$curl = new Curl();
 		$curl->setOpt(CURLOPT_ENCODING, 'gzip');
 		if (!is_array($graph->getProperty('data')->asArray())) {
+			$this->getLogger()->error('No valid picture data of FB-Graph-API');
 			$this->error('We did not receive valid data for fetching images.');
 			return;
 		}
@@ -160,6 +171,7 @@ class AuthController extends BaseController {
 			$curl->download($pic->source, WEBROOT . Config::USER_PICTURES . md5($id) . '.jpg');
 			$picture = $this->getStore()->getById('picture', $id);
 			$this->addResponse('picture', $picture->getPublicData(), 'downloaded');
+			$this->getLogger()->debug('Downloaded image: ' . md5($id));
 		}
 		$columns = array(
 			'fetch_time' => time(),

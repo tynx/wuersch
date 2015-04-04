@@ -7,6 +7,11 @@
 class Request {
 
 	/**
+	 * instance of logging for perfoming log-messages
+	 */
+	private $logger = null;
+
+	/**
 	 * Whetever the current request is valid
 	 */
 	private $valid = false;
@@ -62,6 +67,7 @@ class Request {
 	 * from the global vars and tries to authenticate automatically.
 	 */
 	public function __construct() {
+		$this->logger = 	new Logger();
 		$this->_parse();
 		$this->_authenticate();
 	}
@@ -120,6 +126,14 @@ class Request {
 	}
 
 	/**
+	 * Returns the scope of the request, only used for logging
+	 * @return the scope of the request
+	 */
+	public function getScope() {
+		return $this->controller . '/' . $this->action;
+	}
+
+	/**
 	 * Returns the get-argument provided by key.
 	 * @param name the key of the get-argument
 	 * @return the value of the GET-Argument or null if non-existent.
@@ -174,22 +188,27 @@ class Request {
 	 */
 	private function _authenticate() {
 		if (!$this->hasHeaderField('hmac')) {
+			$this->logger->debug('No hmac header found, so no auth is performed!');
 			return;
 		}
 		if (!$this->hasHeaderField('timestamp')) {
+			$this->logger->warning('No timestamp header found, so invalid auth!');
 			return;
 		}
 		if ((int)$this->getHeaderField('timestamp') + Config::AUTH_TIME_THRESHOLD < time()) {
+			$this->logger->warning('Auth is out of time threshold.');
 			return;
 		}
 		$parts = explode(':', $this->getHeaderField('hmac'));
 		if (count($parts) !== 2) {
+			$this->logger->warning('Invalid content in hmac-auth field');
 			return;
 		}
 		
 		$store = new Store();
 		$user = $store->getById('user', $parts[0]);
 		if ($user === null) {
+			$this->logger->debug('User not found. No auth performed.');
 			return;
 		}
 		$toHash = $this->getHeaderField('timestamp') . "\n";
@@ -198,6 +217,7 @@ class Request {
 		$toHash .= md5($this->post) . "\n";
 		$calcedHash = sha1_hmac($user->secret, $toHash);
 		if ($calcedHash === $parts[1]) {
+			$this->logger->debug('User authenticated.');
 			$this->authenticated = true;
 			$this->user = $user;
 			$columns = array(
@@ -234,16 +254,20 @@ class Request {
 				$this->action = $parts[1];
 			}
 		} elseif (count($parts) > 2) {
+			$this->logger->warning('We found an invalid count of arguments to be a valid request.');
 			$this->valid = false;
 			return;
 		}
 		foreach (getallheaders() as $key => $val) {
+			$this->logger->debug('New header for request: ' . $key . ' => ' . $val);
 			$this->headers[$key] = $val;
 		}
 		foreach ($_GET as $key => $val) {
+			$this->logger->debug('New argument for request: ' . $key . ' => ' . $val);
 			$this->arguments[$key] = $val;
 		}
 		if ($this->getMethod() === 'post') {
+			$this->logger->debug('Reading post from php://input');
 			$this->post = file_get_contents('php://input');
 		}
 		$this->valid = true;

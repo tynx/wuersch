@@ -60,7 +60,7 @@ ALTER TABLE `wuersch`.`match` ADD CONSTRAINT `fk_match_user2` FOREIGN KEY (`id_u
 
 -- LOGGING
 
-CREATE TABLE `wuersch`.`log_request`(
+CREATE TABLE `wuersch`.`log`(
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `id_user` INT NULL,
   `time` BIGINT NOT NULL DEFAULT 0,
@@ -69,11 +69,13 @@ CREATE TABLE `wuersch`.`log_request`(
   DEFAULT CHARACTER SET UTF8
   COLLATE utf8_general_ci;
 
-CREATE TABLE `wuersch`.`log_argument`(
+CREATE TABLE `wuersch`.`log_attribute`(
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `id_request` INT NOT NULL,
+  `id_log` INT NOT NULL,
   `key` VARCHAR(2048) NULL,
   `value` VARCHAR(10240) NULL
 ) ENGINE = InnoDB
   DEFAULT CHARACTER SET UTF8
   COLLATE utf8_general_ci;
+
+ALTER TABLE `wuersch`.`log_attribute` ADD CONSTRAINT `fk_log_attribute_log` FOREIGN KEY (`id_log`) REFERENCES `wuersch`.`log` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

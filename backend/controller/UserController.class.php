@@ -31,6 +31,7 @@ class UserController extends BaseController {
 	 * This method returns the information of the current user.
 	 */
 	public function actionCurrent() {
+		$this->getLogger()->info('Returning current user.');
 		$this->addResponse('user', $this->user->getPublicData());
 	}
 
@@ -40,6 +41,7 @@ class UserController extends BaseController {
 	 * Returns everything of a user.
 	 */
 	public function actionDebug() {
+		$this->getLogger()->warning('Debug method was called!');
 		$this->addResponse('user', $this->user->getPublicData());
 
 		$pictures = $this->getStore()->getByColumns(
@@ -85,6 +87,7 @@ class UserController extends BaseController {
 				'authenticationURL' => Config::FACEBOOK_APP_AUTH_URL . '?idUser=' . md5($id),
 			)
 		);
+		$this->getLogger()->info('new registration. ID: ' . md5($id));
 	}
 
 	/**
@@ -102,6 +105,7 @@ class UserController extends BaseController {
 		
 		if (count($columns) > 0) {
 			$this->getStore()->updateById('user', $this->user->id, $columns);
+			$this->getLogger()->info('Updated preferences.');
 		}
 		$updatedUser = $this->getStore()->getById('user', $this->user->id);
 		$this->addResponse('user', $updatedUser->getPublicData());
@@ -119,21 +123,13 @@ class UserController extends BaseController {
 		$query .= '`user`.`is_female`=' . $this->user->interested_in_female;
 		$query .= ' AND `user`.`fetch_time` > 0 LIMIT 100;';
 		$result = $this->getStore()->getByCustomQuery($query);
+		$this->getLogger()->info('Possible random users found: ' . count($result));
 		if (count($result) === 0) {
 			$this->error("No random user found!");
 			return;
 		}
 		$user = $this->getStore()->getById('user', $result[rand(0, count($result)-1)]['id']);
+		$this->getLogger()->info('Random user returning: ' . $user->id_md5);
 		$this->addResponse('user', $user->getPublicData());
-		$columns = array(
-			'id_user' => $user->id,
-			'default' => 1,
-		);
-		$picture = $this->getStore()->getByColumns('picture', $columns);
-		if (!is_array($picture) && count($picture) !== 1) {
-			$this->error("No picture found for user!");
-			return;
-		}
-		$this->addResponse('picture', $picture[0]->getPublicData());
 	}
 }
