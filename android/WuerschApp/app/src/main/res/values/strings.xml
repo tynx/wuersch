@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Wuersch?</string>
-
     <string name="title_activity_splash_screen">Wuersch?</string>
+    <string name="facebook_app_id">1234</string>
 </resources>
