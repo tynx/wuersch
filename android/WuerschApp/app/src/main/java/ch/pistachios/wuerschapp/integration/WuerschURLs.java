@@ -13,6 +13,10 @@ public class WuerschURLs {
     //Params
     private static final String SECRET = "secret=";
 
+    public static String getBaseUrl() {
+        return BASE_URL;
+    }
+
     public static String getRegisterURL(String secret) {
         String url = appendURL(BASE_URL, USER, REGISTER);
         return appendParams(url, SECRET + secret);
