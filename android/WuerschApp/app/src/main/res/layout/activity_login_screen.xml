@@ -5,7 +5,7 @@
     android:background="#ffffffff"
     android:orientation="vertical"
     android:weightSum="1"
-    tools:context="ch.pistachios.wuerschapp.frontend.LoginScreen">
+    tools:context="ch.pistachios.wuerschapp.LoginScreen">
 
     <Space
         android:layout_width="match_parent"
