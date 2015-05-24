@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">Wuersch?</string>
-    <string name="title_activity_splash_screen">Wuersch?</string>
-    <string name="facebook_app_id">1234</string>
+    <string name="title_activity_splash_screen">Würsch?</string>
+    <string name="error">Fehler: </string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="no_internet_dialog_title">Keine Verbindung zum Internet!</string>
+    <string name="no_internet_dialog_message">Diese App benötigt Internet, bitte prüfe die Verbindung und versuche es erneut. Soll die App beendet werden?</string>
 </resources>
