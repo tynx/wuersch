@@ -136,15 +136,16 @@ For the authentication use HMAC. You have to set two headers: timestamp and hmac
 - timestamp
   - unix timestamp which has to be the same used in the hmac-hash
 - hmac
-  - 4 fields: time, method, path, md5(content)
+  - user => user-id followed by :
+  - hash => 4 fields: time, method, path, md5(content)
 
 example-GET:
 ```
-sha1_hmac($time . "\nget\nuser/current\n" . md5(null) . "\n") => hmac-header
+$uid . ":" . sha1_hmac($time . "\nget\nuser/current\n" . md5(null) . "\n") => hmac-header
 ```
 example-POST
 ```
-sha1_hmac($time . "\npost\nuser/settings\n" . md5($body) . "\n") => hmac-header
+$uid . ":" . sha1_hmac($time . "\npost\nuser/settings\n" . md5($body) . "\n") => hmac-header
 ```
 
 ### Example
