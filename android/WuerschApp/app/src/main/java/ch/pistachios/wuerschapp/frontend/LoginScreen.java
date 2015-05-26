@@ -12,7 +12,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.Date;
+
 import ch.pistachios.wuerschapp.R;
+import ch.pistachios.wuerschapp.integration.user.FetchAuthTask;
+import ch.pistachios.wuerschapp.integration.user.SettingsUserTask;
+import ch.pistachios.wuerschapp.integration.util.CryptoHelper;
 
 
 public class LoginScreen extends FragmentActivity {
@@ -25,19 +30,20 @@ public class LoginScreen extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_screen);
 
+        SharedPreferences sharedPreferences = getSharedPreferences(LoginScreen.PREFS_NAME, 0);
+        String userId = sharedPreferences.getString("userId", null);
+
         loginButtonDirect = (Button) findViewById(R.id.login_button_direct);
         loginButtonDirect.setEnabled(false);
         loginButtonDirect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), FacebookLoginActivity.class);
-                i.putExtra("secret", "secret");
+                String secret = getNewSecret();
+                i.putExtra("secret", secret);
                 startActivityForResult(i, 1);
             }
         });
-
-        SharedPreferences sharedPreferences = getSharedPreferences(LoginScreen.PREFS_NAME, 0);
-        String userId = sharedPreferences.getString("userId", null);
 
         //First check if internet works
         if (!isDeviceOnline()) {
@@ -58,6 +64,12 @@ public class LoginScreen extends FragmentActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(LoginScreen.PREFS_NAME, 0);
         String userId = sharedPreferences.getString("userId", null);
         String secret = sharedPreferences.getString("secret", null);
+
+        //Set interested in male and female to true;
+        new SettingsUserTask(userId, secret).execute();
+        //Fetch the stuff
+        new FetchAuthTask(userId, secret).execute();
+
         if (userId != null && secret != null) {
             Intent i = new Intent(getApplicationContext(), WurschActivity.class);
             startActivity(i);
@@ -76,5 +88,15 @@ public class LoginScreen extends FragmentActivity {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    public String getNewSecret() {
+        try {
+            return CryptoHelper.md5("" + new Date().getTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "" + new Date().getTime();
     }
 }

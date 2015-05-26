@@ -12,15 +12,11 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.security.MessageDigest;
 import java.util.Date;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
+import ch.pistachios.wuerschapp.integration.util.CryptoHelper;
 
 public class GetRequest {
-
-    private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
     private String path;
     private boolean requiresAuth;
@@ -32,44 +28,6 @@ public class GetRequest {
         this.requiresAuth = requiresAuth;
         this.userId = userId;
         this.secret = secret;
-    }
-
-    //Copied from https://gist.github.com/tistaharahap/1202974
-    public static String calculateRFC2104HMAC(String data, String keyString) throws Exception {
-        SecretKeySpec key = new SecretKeySpec(keyString.getBytes(), HMAC_SHA1_ALGORITHM);
-        Mac mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
-        mac.init(key);
-
-        byte[] bytes = mac.doFinal(data.getBytes());
-
-        //return new String( Base64.encodeToString(bytes, Base64.NO_WRAP) );
-
-        //converting byte array to Hexadecimal String
-        StringBuilder sb = new StringBuilder(2 * bytes.length);
-        for (byte b : bytes) {
-            sb.append(String.format("%02x", b & 0xff));
-        }
-
-        return sb.toString();
-    }
-
-    //Copied from http://stackoverflow.com/questions/19234734/how-can-i-get-md5-hash-in-java-wich-whould-look-like-afj5fs5h4sd5hb4g8d6s5sb4g
-    public static String md5(String message) throws Exception {
-        String digest = null;
-        //Life's hard...
-        if (message == null) {
-            return "d41d8cd98f00b204e9800998ecf8427e";
-        }
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] hash = md.digest(message.getBytes("UTF-8"));
-
-        //converting byte array to Hexadecimal String
-        StringBuilder sb = new StringBuilder(2 * hash.length);
-        for (byte b : hash) {
-            sb.append(String.format("%02x", b & 0xff));
-        }
-
-        return sb.toString();
     }
 
     public GetResponse getResponse() {
@@ -116,8 +74,8 @@ public class GetRequest {
     private void addAuthFields(HttpGet httpGet) {
         try {
             String timestamp = "" + new Date().getTime();
-            String md5 = md5(null);
-            String hmac = calculateRFC2104HMAC(timestamp + "\n" + "get" + "\n" + this.path + "\n" + md5 + "\n", secret);
+            String md5 = CryptoHelper.md5(null);
+            String hmac = CryptoHelper.calculateRFC2104HMAC(timestamp + "\n" + "get" + "\n" + this.path + "\n" + md5 + "\n", secret);
             httpGet.addHeader("timestamp", timestamp);
             httpGet.addHeader("hmac", userId + ":" + hmac);
         } catch (Exception e) {

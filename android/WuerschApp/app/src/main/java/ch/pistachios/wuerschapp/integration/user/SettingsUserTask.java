@@ -8,14 +8,16 @@ import ch.pistachios.wuerschapp.integration.WuerschURLs;
 
 public class SettingsUserTask extends AsyncTask<String, Void, CurrentUserTaskResponse> {
     private String userId;
+    private String secret;
 
-    public SettingsUserTask(String userId) {
+    public SettingsUserTask(String userId, String secret) {
         this.userId = userId;
+        this.secret = secret;
     }
 
     @Override
     protected CurrentUserTaskResponse doInBackground(String... strings) {
-        PostRequest postRequest = new PostRequest(WuerschURLs.getSettingsUserPath(), true, userId, "{\"interestedInMale\":true,\n\"interestedInFemale\":true}");
+        PostRequest postRequest = new PostRequest(WuerschURLs.getSettingsUserPath(), true, userId, secret);
         GetResponse response = postRequest.sendData();
         return null;
     }

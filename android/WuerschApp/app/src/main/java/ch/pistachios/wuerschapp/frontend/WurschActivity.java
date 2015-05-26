@@ -14,8 +14,7 @@ import android.widget.Toast;
 import ch.pistachios.wuerschapp.R;
 import ch.pistachios.wuerschapp.integration.user.CurrentUserTask;
 import ch.pistachios.wuerschapp.integration.user.CurrentUserTaskResponse;
-import ch.pistachios.wuerschapp.integration.user.FetchAuthTask;
-import ch.pistachios.wuerschapp.integration.user.SettingsUserTask;
+import ch.pistachios.wuerschapp.integration.user.RandomUserTask;
 
 public class WurschActivity extends Activity {
 
@@ -34,13 +33,11 @@ public class WurschActivity extends Activity {
             Intent i = new Intent(getApplicationContext(), LoginScreen.class);
             startActivity(i);
         } else {
-
-            new SettingsUserTask(userId).execute();
             AsyncTask<String, Void, CurrentUserTaskResponse> currentUserTask = new CurrentUserTask(userId, secret).execute();
             try {
                 CurrentUserTaskResponse loginTaskResponse = currentUserTask.get();
                 if (loginTaskResponse.getStatus().isOk()) {
-                    new FetchAuthTask(userId, secret).execute();
+                    new RandomUserTask(userId, secret).execute();
                 } else {
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + loginTaskResponse.getStatusMessage(), Toast.LENGTH_LONG).show();
                 }

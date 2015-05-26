@@ -12,6 +12,7 @@ public class WuerschURLs {
     private static final String REGISTER = "register";
     private static final String CURRENT = "current";
     private static final String SETTINGS = "settings";
+    private static final String RANDOM = "random";
 
     private static final String AUTH = "auth";
     private static final String FETCH = "fetch";
@@ -30,7 +31,7 @@ public class WuerschURLs {
     }
 
     public static String getCurrentUserPath() {
-        return appendURL(USER, "debug");
+        return appendURL(USER, CURRENT);
     }
 
     public static String getSettingsUserPath() {
@@ -39,6 +40,10 @@ public class WuerschURLs {
 
     public static String getFetchAuthUserPath() {
         return appendURL(AUTH, FETCH);
+    }
+
+    public static String getRandomUserPath() {
+        return appendURL(USER, RANDOM);
     }
 
     private static String appendURL(String... args) {
