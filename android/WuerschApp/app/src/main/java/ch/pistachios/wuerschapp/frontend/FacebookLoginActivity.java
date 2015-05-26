@@ -10,14 +10,15 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import ch.pistachios.wuerschapp.R;
-import ch.pistachios.wuerschapp.integration.Login.LoginTask;
-import ch.pistachios.wuerschapp.integration.Login.LoginTaskResponse;
 import ch.pistachios.wuerschapp.integration.WuerschURLs;
+import ch.pistachios.wuerschapp.integration.login.LoginTask;
+import ch.pistachios.wuerschapp.integration.login.LoginTaskResponse;
 
 public class FacebookLoginActivity extends Activity {
 
     WebView webView;
     private String userId;
+    private String secret;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,18 +33,21 @@ public class FacebookLoginActivity extends Activity {
             }
         });
 
+        String newSecret = getIntent().getExtras().getString("secret");
+
         //Get login URL
-        AsyncTask<String, Void, LoginTaskResponse> loginTask = new LoginTask("secret").execute();
+        AsyncTask<String, Void, LoginTaskResponse> loginTask = new LoginTask(newSecret).execute();
         try {
             LoginTaskResponse loginTaskResponse = loginTask.get();
             if (loginTaskResponse.getStatus().isOk()) {
                 userId = loginTaskResponse.getId();
+                secret = newSecret;
                 String authenticationURL = loginTaskResponse.getAuthenticationURL();
                 checkIfLoginWasDone(authenticationURL);
                 webView.loadUrl(authenticationURL);
 
             } else {
-                Toast.makeText(getApplicationContext(), R.string.error + loginTaskResponse.getStatusMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + loginTaskResponse.getStatusMessage(), Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -54,7 +58,10 @@ public class FacebookLoginActivity extends Activity {
         if (url.startsWith(WuerschURLs.getBaseUrl())) {
             SharedPreferences sharedPreferences = getSharedPreferences(LoginScreen.PREFS_NAME, 0);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("userId", userId);
+            if (userId != null && secret != null) {
+                editor.putString("userId", userId);
+                editor.putString("secret", secret);
+            }
             editor.apply();
             Intent returnIntent = new Intent();
             setResult(RESULT_OK, returnIntent);

@@ -4,7 +4,8 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,20 +19,20 @@ import java.util.Date;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-public class GetRequest {
+public class PostRequest {
 
     private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
     private String path;
     private boolean requiresAuth;
     private String userId;
-    private String secret;
+    private String data;
 
-    public GetRequest(String path, boolean requiresAuth, String userId, String secret) {
+    public PostRequest(String path, boolean requiresAuth, String userId, String data) {
         this.path = path;
         this.requiresAuth = requiresAuth;
         this.userId = userId;
-        this.secret = secret;
+        this.data = data;
     }
 
     //Copied from https://gist.github.com/tistaharahap/1202974
@@ -72,17 +73,23 @@ public class GetRequest {
         return sb.toString();
     }
 
-    public GetResponse getResponse() {
+    public GetResponse sendData() {
         String baseUrl = WuerschURLs.getBaseUrl();
         StringBuilder builder = new StringBuilder();
         HttpClient client = new DefaultHttpClient();
-        HttpGet httpGet = new HttpGet(baseUrl + this.path);
+        HttpPost httpPost = new HttpPost(baseUrl + this.path);
         if (requiresAuth) {
-            addAuthFields(httpGet);
+            addAuthFields(httpPost);
         }
         GetResponse getResponse;
         try {
-            HttpResponse response = client.execute(httpGet);
+            JSONObject settings = new JSONObject();
+            settings.put("interestedInMale", true);
+            settings.put("interestedInFemale", true);
+            StringEntity se = new StringEntity(settings.toString());
+            httpPost.setEntity(se);
+
+            HttpResponse response = client.execute(httpPost);
             StatusLine statusLine = response.getStatusLine();
             int statusCode = statusLine.getStatusCode();
             if (statusCode == 200) {
@@ -113,13 +120,13 @@ public class GetRequest {
         return getResponse;
     }
 
-    private void addAuthFields(HttpGet httpGet) {
+    private void addAuthFields(HttpPost httpPost) {
         try {
             String timestamp = "" + new Date().getTime();
-            String md5 = md5(null);
-            String hmac = calculateRFC2104HMAC(timestamp + "\n" + "get" + "\n" + this.path + "\n" + md5 + "\n", secret);
-            httpGet.addHeader("timestamp", timestamp);
-            httpGet.addHeader("hmac", userId + ":" + hmac);
+            String md5 = md5(data);
+            String hmac = calculateRFC2104HMAC(timestamp + "\n" + "post" + "\n" + this.path + "\n" + md5 + "\n", "secret2");
+            httpPost.addHeader("timestamp", timestamp);
+            httpPost.addHeader("hmac", userId + ":" + hmac);
         } catch (Exception e) {
 
         }

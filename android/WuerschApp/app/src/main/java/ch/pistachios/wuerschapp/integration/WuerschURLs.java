@@ -6,9 +6,16 @@ public class WuerschURLs {
     //URL Parts
     private static final String URL_DELIMITER = "/";
     private static final String PARAM_DELIMITER = "?";
-    private static final String BASE_URL = "http://wuersch.pistachios.ch";
+    private static final String BASE_URL = "http://wuersch.pistachios.ch/";
+
     private static final String USER = "user";
     private static final String REGISTER = "register";
+    private static final String CURRENT = "current";
+    private static final String SETTINGS = "settings";
+
+    private static final String AUTH = "auth";
+    private static final String FETCH = "fetch";
+
 
     //Params
     private static final String SECRET = "secret=";
@@ -17,9 +24,21 @@ public class WuerschURLs {
         return BASE_URL;
     }
 
-    public static String getRegisterURL(String secret) {
-        String url = appendURL(BASE_URL, USER, REGISTER);
-        return appendParams(url, SECRET + secret);
+    public static String getRegisterPath(String secret) {
+        String path = appendURL(USER, REGISTER);
+        return appendParams(path, SECRET + secret);
+    }
+
+    public static String getCurrentUserPath() {
+        return appendURL(USER, "debug");
+    }
+
+    public static String getSettingsUserPath() {
+        return appendURL(USER, SETTINGS);
+    }
+
+    public static String getFetchAuthUserPath() {
+        return appendURL(AUTH, FETCH);
     }
 
     private static String appendURL(String... args) {

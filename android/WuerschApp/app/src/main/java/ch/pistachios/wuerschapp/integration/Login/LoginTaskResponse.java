@@ -1,4 +1,4 @@
-package ch.pistachios.wuerschapp.integration.Login;
+package ch.pistachios.wuerschapp.integration.login;
 
 
 import ch.pistachios.wuerschapp.integration.GetRequestStatus;

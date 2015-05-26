@@ -1,4 +1,4 @@
-package ch.pistachios.wuerschapp.integration.Login;
+package ch.pistachios.wuerschapp.integration.login;
 
 import android.os.AsyncTask;
 
@@ -20,7 +20,7 @@ public class LoginTask extends AsyncTask<String, Void, LoginTaskResponse> {
 
     @Override
     protected LoginTaskResponse doInBackground(String... args) {
-        GetRequest getRequest = new GetRequest(WuerschURLs.getRegisterURL(secret));
+        GetRequest getRequest = new GetRequest(WuerschURLs.getRegisterPath(secret), false, null, secret);
         GetResponse response = getRequest.getResponse();
 
         GetRequestStatus status = response.getGetRequestStatus();

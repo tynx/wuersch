@@ -16,7 +16,7 @@
             android:label="@string/title_activity_splash_screen"
             android:screenOrientation="portrait"
             android:theme="@style/FullscreenTheme">
-        <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -32,6 +32,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.pistachios.wuerschapp.frontend.LoginScreen" />
         </activity>
+        <activity
+            android:name=".frontend.WurschActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_wursch"
+            android:theme="@style/FullscreenTheme"></activity>
     </application>
 
 </manifest>

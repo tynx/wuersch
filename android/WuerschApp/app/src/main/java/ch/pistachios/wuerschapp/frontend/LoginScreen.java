@@ -31,30 +31,39 @@ public class LoginScreen extends FragmentActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), FacebookLoginActivity.class);
+                i.putExtra("secret", "secret");
                 startActivityForResult(i, 1);
             }
         });
 
+        SharedPreferences sharedPreferences = getSharedPreferences(LoginScreen.PREFS_NAME, 0);
+        String userId = sharedPreferences.getString("userId", null);
+
         //First check if internet works
         if (!isDeviceOnline()) {
             showNoInternetDialog();
+        } else if (userId != null) {
+            Intent i = new Intent(getApplicationContext(), WurschActivity.class);
+            startActivity(i);
         } else {
             loginButtonDirect.setEnabled(true);
         }
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         SharedPreferences sharedPreferences = getSharedPreferences(LoginScreen.PREFS_NAME, 0);
         String userId = sharedPreferences.getString("userId", null);
-        Toast.makeText(getApplicationContext(), "Yes!!!: " + userId, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
+        String secret = sharedPreferences.getString("secret", null);
+        if (userId != null && secret != null) {
+            Intent i = new Intent(getApplicationContext(), WurschActivity.class);
+            startActivity(i);
+        } else {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + "Login fehlgeschlagen, bitte versuche es erneut!", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void showNoInternetDialog() {
@@ -62,7 +71,6 @@ public class LoginScreen extends FragmentActivity {
         NoInternetDialog noInternetDialog = new NoInternetDialog();
         noInternetDialog.show(fm, "fragment_no_internet");
     }
-
 
     public boolean isDeviceOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
