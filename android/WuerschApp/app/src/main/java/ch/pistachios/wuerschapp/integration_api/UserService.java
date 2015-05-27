@@ -2,6 +2,9 @@ package ch.pistachios.wuerschapp.integration_api;
 
 import android.os.AsyncTask;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import ch.pistachios.wuerschapp.integration.TaskResponse;
 import ch.pistachios.wuerschapp.integration.login.LoginTask;
 import ch.pistachios.wuerschapp.integration.login.LoginTaskResponse;
@@ -15,9 +18,11 @@ import ch.pistachios.wuerschapp.integration.user.SettingsUserTask;
 public class UserService {
 
     private static UserService userService;
+    private Map<String, PictureTaskResponse> pictureCache;
 
     private UserService() {
         //Singleton
+        pictureCache = new HashMap<>();
     }
 
     public static UserService get() {
@@ -51,12 +56,17 @@ public class UserService {
         RandomUserTaskResponse randomUserTaskResponse = new RandomUserTask(userId, secret).execute().get();
         if (randomUserTaskResponse.getStatus().isOk()) {
             String randomUserId = randomUserTaskResponse.getRandomUserId();
-            PictureTaskResponse pictureTaskResponse = new PictureTask(userId, secret, randomUserId).execute().get();
-            if (!pictureTaskResponse.getStatus().isOk()) {
-                throw new Exception(pictureTaskResponse.getStatusMessage());
+            if(!pictureCache.containsKey(randomUserId)) {
+                PictureTaskResponse pictureTaskResponse = new PictureTask(userId, secret, randomUserId).execute().get();
+                if (!pictureTaskResponse.getStatus().isOk()) {
+                    throw new Exception(pictureTaskResponse.getStatusMessage());
+                }
+                pictureCache.put(randomUserId, pictureTaskResponse);
+                return pictureTaskResponse;
+            } else {
+                return pictureCache.get(randomUserId);
             }
 
-            return pictureTaskResponse;
         } else {
             throw new Exception(randomUserTaskResponse.getStatusMessage());
         }
