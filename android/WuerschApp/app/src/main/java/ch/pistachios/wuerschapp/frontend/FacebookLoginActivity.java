@@ -3,7 +3,6 @@ package ch.pistachios.wuerschapp.frontend;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -11,8 +10,8 @@ import android.widget.Toast;
 
 import ch.pistachios.wuerschapp.R;
 import ch.pistachios.wuerschapp.integration.WuerschURLs;
-import ch.pistachios.wuerschapp.integration.login.LoginTask;
 import ch.pistachios.wuerschapp.integration.login.LoginTaskResponse;
+import ch.pistachios.wuerschapp.integration_api.UserService;
 
 public class FacebookLoginActivity extends Activity {
 
@@ -33,24 +32,17 @@ public class FacebookLoginActivity extends Activity {
             }
         });
 
-        String newSecret = getIntent().getExtras().getString("secret");
-
-        //Get login URL
-        AsyncTask<String, Void, LoginTaskResponse> loginTask = new LoginTask(newSecret).execute();
         try {
-            LoginTaskResponse loginTaskResponse = loginTask.get();
-            if (loginTaskResponse.getStatus().isOk()) {
-                userId = loginTaskResponse.getId();
-                secret = newSecret;
-                String authenticationURL = loginTaskResponse.getAuthenticationURL();
-                checkIfLoginWasDone(authenticationURL);
-                webView.loadUrl(authenticationURL);
+            String newSecret = getIntent().getExtras().getString("secret");
+            LoginTaskResponse loginTaskResponse = UserService.get().getLoginURL(newSecret);
+            userId = loginTaskResponse.getId();
+            secret = newSecret;
+            String authenticationURL = loginTaskResponse.getAuthenticationURL();
+            checkIfLoginWasDone(authenticationURL);
+            webView.loadUrl(authenticationURL);
 
-            } else {
-                Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + loginTaskResponse.getStatusMessage(), Toast.LENGTH_LONG).show();
-            }
         } catch (Exception e) {
-            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

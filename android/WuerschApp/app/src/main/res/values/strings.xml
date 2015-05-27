@@ -2,6 +2,7 @@
     <string name="app_name">Wuersch?</string>
     <string name="title_activity_splash_screen">Würsch?</string>
     <string name="error">Fehler: </string>
+    <string name="error_login">Login fehlgeschlagen, bitte versuche es erneut!</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="no_internet_dialog_title">Keine Verbindung zum Internet!</string>

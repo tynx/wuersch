@@ -15,9 +15,8 @@ import android.widget.Toast;
 import java.util.Date;
 
 import ch.pistachios.wuerschapp.R;
-import ch.pistachios.wuerschapp.integration.user.FetchAuthTask;
-import ch.pistachios.wuerschapp.integration.user.SettingsUserTask;
 import ch.pistachios.wuerschapp.integration.util.CryptoHelper;
+import ch.pistachios.wuerschapp.integration_api.UserService;
 
 
 public class LoginScreen extends FragmentActivity {
@@ -60,21 +59,20 @@ public class LoginScreen extends FragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences(LoginScreen.PREFS_NAME, 0);
+            String userId = sharedPreferences.getString("userId", null);
+            String secret = sharedPreferences.getString("secret", null);
 
-        SharedPreferences sharedPreferences = getSharedPreferences(LoginScreen.PREFS_NAME, 0);
-        String userId = sharedPreferences.getString("userId", null);
-        String secret = sharedPreferences.getString("secret", null);
-
-        //Set interested in male and female to true;
-        new SettingsUserTask(userId, secret).execute();
-        //Fetch the stuff
-        new FetchAuthTask(userId, secret).execute();
-
-        if (userId != null && secret != null) {
-            Intent i = new Intent(getApplicationContext(), WurschActivity.class);
-            startActivity(i);
-        } else {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + "Login fehlgeschlagen, bitte versuche es erneut!", Toast.LENGTH_LONG).show();
+            if (userId != null && secret != null) {
+                UserService.get().initUser(userId, secret);
+                Intent i = new Intent(getApplicationContext(), WurschActivity.class);
+                startActivity(i);
+            } else {
+                Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + getResources().getString(R.string.error_login), Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

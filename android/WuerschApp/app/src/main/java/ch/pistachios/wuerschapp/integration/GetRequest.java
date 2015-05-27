@@ -1,10 +1,14 @@
 package ch.pistachios.wuerschapp.integration;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -45,28 +49,42 @@ public class GetRequest {
             int statusCode = statusLine.getStatusCode();
             if (statusCode == 200) {
                 HttpEntity entity = response.getEntity();
-                InputStream content = entity.getContent();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line);
-                }
-                JSONObject responseObject = new JSONObject(builder.toString());
-                GetRequestStatus getRequestStatus = GetRequestStatus.valueOf(responseObject.getString("status"));
-                String statusMessage = responseObject.getString("statusMessage");
-                JSONArray responses = responseObject.getJSONArray("responses");
+
                 JSONObject data = null;
-                if (responses.length() > 0) {
-                    data = ((JSONObject) responses.get(0)).getJSONObject("data");
+                Bitmap bitmap = null;
+
+                GetRequestStatus getRequestStatus;
+                String statusMessage = "";
+                if (!this.path.startsWith(WuerschURLs.PICTURE)) {
+                    InputStream content = entity.getContent();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        builder.append(line);
+                    }
+                    String dataString = builder.toString();
+                    JSONObject responseObject = new JSONObject(dataString);
+                    getRequestStatus = GetRequestStatus.valueOf(responseObject.getString("status"));
+                    statusMessage = responseObject.getString("statusMessage");
+                    JSONArray responses = responseObject.getJSONArray("responses");
+
+                    if (responses.length() > 0) {
+                        data = ((JSONObject) responses.get(0)).getJSONObject("data");
+                    }
+                } else {
+                    BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
+                    InputStream instream = bufHttpEntity.getContent();
+                    bitmap = BitmapFactory.decodeStream(instream);
+                    getRequestStatus = GetRequestStatus.OK;
                 }
 
-                getResponse = new GetResponse(getRequestStatus, statusMessage, data);
+                getResponse = new GetResponse(getRequestStatus, statusMessage, data, bitmap);
 
             } else {
-                getResponse = new GetResponse(GetRequestStatus.FAIL, statusLine.getReasonPhrase(), null);
+                getResponse = new GetResponse(GetRequestStatus.FAIL, statusLine.getReasonPhrase(), null, null);
             }
         } catch (Exception e) {
-            getResponse = new GetResponse(GetRequestStatus.FAIL, e.getMessage(), null);
+            getResponse = new GetResponse(GetRequestStatus.FAIL, e.getMessage(), null, null);
         }
         return getResponse;
     }
@@ -82,6 +100,5 @@ public class GetRequest {
 
         }
     }
-
 }
 

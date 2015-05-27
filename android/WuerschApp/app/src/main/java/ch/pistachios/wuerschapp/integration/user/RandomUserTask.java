@@ -2,6 +2,7 @@ package ch.pistachios.wuerschapp.integration.user;
 
 import android.os.AsyncTask;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import ch.pistachios.wuerschapp.integration.GetRequest;
@@ -9,7 +10,7 @@ import ch.pistachios.wuerschapp.integration.GetRequestStatus;
 import ch.pistachios.wuerschapp.integration.GetResponse;
 import ch.pistachios.wuerschapp.integration.WuerschURLs;
 
-public class RandomUserTask extends AsyncTask<String, Void, CurrentUserTaskResponse> {
+public class RandomUserTask extends AsyncTask<String, Void, RandomUserTaskResponse> {
 
     private String userId;
     private String secret;
@@ -20,25 +21,23 @@ public class RandomUserTask extends AsyncTask<String, Void, CurrentUserTaskRespo
     }
 
     @Override
-    protected CurrentUserTaskResponse doInBackground(String... strings) {
+    protected RandomUserTaskResponse doInBackground(String... strings) {
         GetRequest getRequest = new GetRequest(WuerschURLs.getRandomUserPath(), true, userId, secret);
         GetResponse response = getRequest.getResponse();
 
         GetRequestStatus status = response.getGetRequestStatus();
         String statusMessage = response.getStatusMessage();
-        //String id = null;
-        //String authenticationURL = null;
 
+        String randomUserId = null;
         if (response.getGetRequestStatus().isOk()) {
             JSONObject data = response.getData();
-            //try {
-            //id = data.getString("id");
-            //authenticationURL = data.getString("authenticationURL");
-            //} catch (JSONException e) {
-            //    status = GetRequestStatus.FAIL;
-            //    statusMessage = e.getMessage();
-            //}
+            try {
+                randomUserId = data.getString("id");
+            } catch (JSONException e) {
+                status = GetRequestStatus.FAIL;
+                statusMessage = e.getMessage();
+            }
         }
-        return new CurrentUserTaskResponse(status, statusMessage);
+        return new RandomUserTaskResponse(status, statusMessage, randomUserId);
     }
 }

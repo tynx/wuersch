@@ -2,26 +2,16 @@ package ch.pistachios.wuerschapp.integration.login;
 
 
 import ch.pistachios.wuerschapp.integration.GetRequestStatus;
+import ch.pistachios.wuerschapp.integration.TaskResponse;
 
-public class LoginTaskResponse {
-    private final GetRequestStatus status;
-    private final String statusMessage;
+public class LoginTaskResponse extends TaskResponse {
     private final String id;
     private final String authenticationURL;
 
     public LoginTaskResponse(GetRequestStatus status, String statusMessage, String id, String authenticationURL) {
-        this.status = status;
-        this.statusMessage = statusMessage;
+        super(status, statusMessage);
         this.id = id;
         this.authenticationURL = authenticationURL;
-    }
-
-    public GetRequestStatus getStatus() {
-        return status;
-    }
-
-    public String getStatusMessage() {
-        return statusMessage;
     }
 
     public String getId() {

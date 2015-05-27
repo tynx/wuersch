@@ -30,7 +30,6 @@ public class CryptoHelper {
 
     //Copied from http://stackoverflow.com/questions/19234734/how-can-i-get-md5-hash-in-java-wich-whould-look-like-afj5fs5h4sd5hb4g8d6s5sb4g
     public static String md5(String message) throws Exception {
-        String digest = null;
         //Life's hard...
         if (message == null) {
             return "d41d8cd98f00b204e9800998ecf8427e";

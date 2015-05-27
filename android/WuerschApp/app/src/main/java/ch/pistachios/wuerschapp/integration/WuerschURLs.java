@@ -3,23 +3,21 @@ package ch.pistachios.wuerschapp.integration;
 import com.google.common.base.Joiner;
 
 public class WuerschURLs {
+    static final String PICTURE = "picture";
     //URL Parts
     private static final String URL_DELIMITER = "/";
     private static final String PARAM_DELIMITER = "?";
     private static final String BASE_URL = "http://wuersch.pistachios.ch/";
-
     private static final String USER = "user";
     private static final String REGISTER = "register";
     private static final String CURRENT = "current";
     private static final String SETTINGS = "settings";
     private static final String RANDOM = "random";
-
     private static final String AUTH = "auth";
     private static final String FETCH = "fetch";
-
-
     //Params
     private static final String SECRET = "secret=";
+    private static final String USER_ID = "idUser=";
 
     public static String getBaseUrl() {
         return BASE_URL;
@@ -45,6 +43,12 @@ public class WuerschURLs {
     public static String getRandomUserPath() {
         return appendURL(USER, RANDOM);
     }
+
+    public static String getPicturePath(String userId) {
+        return appendParams(PICTURE, USER_ID + userId);
+    }
+
+
 
     private static String appendURL(String... args) {
         Joiner joiner = Joiner.on(URL_DELIMITER).skipNulls();

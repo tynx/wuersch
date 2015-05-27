@@ -45,7 +45,7 @@ public class PostRequest {
 
         JSONObject settings = new JSONObject();
         try {
-            settings.put("interestedInMale", true);
+            settings.put("interestedInMale", false);
             settings.put("interestedInFemale", true);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -81,13 +81,13 @@ public class PostRequest {
                     data = ((JSONObject) responses.get(0)).getJSONObject("data");
                 }
 
-                getResponse = new GetResponse(getRequestStatus, statusMessage, data);
+                getResponse = new GetResponse(getRequestStatus, statusMessage, data, null);
 
             } else {
-                getResponse = new GetResponse(GetRequestStatus.FAIL, statusLine.getReasonPhrase(), null);
+                getResponse = new GetResponse(GetRequestStatus.FAIL, statusLine.getReasonPhrase(), null, null);
             }
         } catch (Exception e) {
-            getResponse = new GetResponse(GetRequestStatus.FAIL, e.getMessage(), null);
+            getResponse = new GetResponse(GetRequestStatus.FAIL, e.getMessage(), null, null);
         }
         return getResponse;
     }
