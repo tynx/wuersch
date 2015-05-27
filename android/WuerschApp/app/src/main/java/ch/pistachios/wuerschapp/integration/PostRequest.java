@@ -22,8 +22,6 @@ import ch.pistachios.wuerschapp.integration.util.CryptoHelper;
 
 public class PostRequest {
 
-    private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
-
     private String path;
     private boolean requiresAuth;
     private String userId;

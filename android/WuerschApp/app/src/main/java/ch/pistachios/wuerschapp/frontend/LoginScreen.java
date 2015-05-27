@@ -29,27 +29,16 @@ public class LoginScreen extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_screen);
+        initView();
 
         SharedPreferences sharedPreferences = getSharedPreferences(WuerschConfigValues.PREFS_NAME, 0);
         String userId = sharedPreferences.getString(WuerschConfigValues.USER_ID, null);
-
-        loginButtonDirect = (Button) findViewById(R.id.login_button_direct);
-        loginButtonDirect.setEnabled(false);
-        loginButtonDirect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), FacebookLoginActivity.class);
-                String secret = getNewSecret();
-                i.putExtra(WuerschConfigValues.SECRET, secret);
-                startActivityForResult(i, 1);
-            }
-        });
+        String secret = sharedPreferences.getString(WuerschConfigValues.SECRET, null);
 
         //First check if internet works
         if (!isDeviceOnline()) {
             showNoInternetDialog();
-        } else if (userId != null) {
+        } else if (userId != null && secret != null) {
             Intent i = new Intent(getApplicationContext(), WurschActivity.class);
             startActivity(i);
         } else {
@@ -78,6 +67,19 @@ public class LoginScreen extends FragmentActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sharedPreferences = getSharedPreferences(WuerschConfigValues.PREFS_NAME, 0);
+        String userId = sharedPreferences.getString(WuerschConfigValues.USER_ID, null);
+        String secret = sharedPreferences.getString(WuerschConfigValues.SECRET, null);
+
+        if (userId != null && secret != null) {
+            Intent i = new Intent(getApplicationContext(), WurschActivity.class);
+            startActivity(i);
+        }
+    }
+
     private void showNoInternetDialog() {
         FragmentManager fm = getSupportFragmentManager();
         NoInternetDialog noInternetDialog = new NoInternetDialog();
@@ -98,5 +100,21 @@ public class LoginScreen extends FragmentActivity {
         }
 
         return "" + new Date().getTime();
+    }
+
+    private void initView() {
+        setContentView(R.layout.activity_login_screen);
+
+        loginButtonDirect = (Button) findViewById(R.id.login_button_direct);
+        loginButtonDirect.setEnabled(false);
+        loginButtonDirect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), FacebookLoginActivity.class);
+                String secret = getNewSecret();
+                i.putExtra(WuerschConfigValues.SECRET, secret);
+                startActivityForResult(i, 1);
+            }
+        });
     }
 }

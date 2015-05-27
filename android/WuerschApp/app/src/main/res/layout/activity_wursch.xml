@@ -30,26 +30,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
+        android:background="#ffffffff"
         android:orientation="horizontal"
-        android:weightSum="1"
-        android:background="#ffffffff">
+        android:weightSum="1">
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
             android:id="@+id/wuersch_yes"
-            android:layout_weight="0.33"
-            android:src="@mipmap/ic_yes"
-            android:src="@mipmap/ic_yes"
-            android:background="@null" />
-
-        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:id="@+id/wuersch_no"
             android:layout_weight="0.33"
-            android:src="@mipmap/ic_no"
-            android:background="@null" />
+            android:background="@null"
+            android:src="@mipmap/ic_yes" />
+
+        <ImageButton
+            android:id="@+id/wuersch_no"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.33"
+            android:background="@null"
+            android:src="@mipmap/ic_no" />
 
     </LinearLayout>
 

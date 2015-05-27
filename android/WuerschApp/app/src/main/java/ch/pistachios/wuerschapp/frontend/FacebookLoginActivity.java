@@ -23,15 +23,8 @@ public class FacebookLoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_facebook_login);
-        webView = (WebView) findViewById(R.id.webView);
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                checkIfLoginWasDone(url);
-            }
-        });
+
+        initView();
 
         try {
             String newSecret = getIntent().getExtras().getString(WuerschConfigValues.SECRET);
@@ -60,5 +53,17 @@ public class FacebookLoginActivity extends Activity {
             setResult(RESULT_OK, returnIntent);
             finish();
         }
+    }
+
+    private void initView() {
+        setContentView(R.layout.activity_facebook_login);
+        webView = (WebView) findViewById(R.id.webView);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                checkIfLoginWasDone(url);
+            }
+        });
     }
 }

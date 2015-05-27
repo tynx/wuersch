@@ -10,7 +10,6 @@ public class WuerschURLs {
     private static final String BASE_URL = "http://wuersch.pistachios.ch/";
     private static final String USER = "user";
     private static final String REGISTER = "register";
-    private static final String CURRENT = "current";
     private static final String SETTINGS = "settings";
     private static final String RANDOM = "random";
     private static final String AUTH = "auth";
@@ -28,10 +27,6 @@ public class WuerschURLs {
         return appendParams(path, SECRET + secret);
     }
 
-    public static String getCurrentUserPath() {
-        return appendURL(USER, CURRENT);
-    }
-
     public static String getSettingsUserPath() {
         return appendURL(USER, SETTINGS);
     }
@@ -47,7 +42,6 @@ public class WuerschURLs {
     public static String getPicturePath(String userId) {
         return appendParams(PICTURE, USER_ID + userId);
     }
-
 
 
     private static String appendURL(String... args) {

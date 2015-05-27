@@ -37,6 +37,8 @@ public class UserService {
             //Fetch the stuff
             fetchTaskResponse = new FetchAuthTask(userId, secret).execute().get();
             if (!fetchTaskResponse.getStatus().isOk()) {
+                //Due to debugging reasons this is not active.
+                //This call fails if it is called to often...
                 //throw new Exception(fetchTaskResponse.getStatusMessage());
             }
         } else {

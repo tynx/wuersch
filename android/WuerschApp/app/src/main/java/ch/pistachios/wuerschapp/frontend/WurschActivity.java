@@ -32,33 +32,7 @@ public class WurschActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_wursch);
-
-        wuerschImage = (ImageView) findViewById(R.id.wuerschImage);
-        wuerschYes = (ImageButton) findViewById(R.id.wuersch_yes);
-        wuerschNo = (ImageButton) findViewById(R.id.wuersch_no);
-
-        wuerschYes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    showNextRandomUser();
-                } catch (Exception e) {
-                    ExceptionHelper.showExceptionToast(getApplicationContext(), getResources(), e);
-                }
-            }
-        });
-
-        wuerschNo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    showNextRandomUser();
-                } catch (Exception e) {
-                    ExceptionHelper.showExceptionToast(getApplicationContext(), getResources(), e);
-                }
-            }
-        });
+        initView();
 
         try {
             SharedPreferences sharedPreferences = getSharedPreferences(WuerschConfigValues.PREFS_NAME, 0);
@@ -78,7 +52,12 @@ public class WurschActivity extends Activity {
         }
     }
 
-    public boolean isDeviceOnline() {
+    @Override
+    public void onBackPressed() {
+        //No back navigation needed
+    }
+
+    private boolean isDeviceOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
@@ -90,5 +69,39 @@ public class WurschActivity extends Activity {
         Bitmap image = randomImageResponse.getImage();
         wuerschImage.setImageBitmap(image);
         wuerschImage.invalidate();
+    }
+
+    private void initView() {
+        setContentView(R.layout.activity_wursch);
+
+        wuerschImage = (ImageView) findViewById(R.id.wuerschImage);
+        wuerschYes = (ImageButton) findViewById(R.id.wuersch_yes);
+        wuerschNo = (ImageButton) findViewById(R.id.wuersch_no);
+
+        wuerschYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    //Send would to the server, but due to few test account we do not send this to the backend
+                    //(You can only would/would_not a person once!)
+                    showNextRandomUser();
+                } catch (Exception e) {
+                    ExceptionHelper.showExceptionToast(getApplicationContext(), getResources(), e);
+                }
+            }
+        });
+
+        wuerschNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    //Send would_not to the server, but due to few test account we do not send this to the backend
+                    //(You can only would/would_not a person once!)
+                    showNextRandomUser();
+                } catch (Exception e) {
+                    ExceptionHelper.showExceptionToast(getApplicationContext(), getResources(), e);
+                }
+            }
+        });
     }
 }
