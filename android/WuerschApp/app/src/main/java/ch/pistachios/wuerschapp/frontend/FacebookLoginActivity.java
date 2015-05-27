@@ -6,11 +6,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import ch.pistachios.wuerschapp.R;
 import ch.pistachios.wuerschapp.integration.WuerschURLs;
 import ch.pistachios.wuerschapp.integration.login.LoginTaskResponse;
+import ch.pistachios.wuerschapp.integration.util.ExceptionHelper;
+import ch.pistachios.wuerschapp.integration.util.WuerschConfigValues;
 import ch.pistachios.wuerschapp.integration_api.UserService;
 
 public class FacebookLoginActivity extends Activity {
@@ -33,7 +34,7 @@ public class FacebookLoginActivity extends Activity {
         });
 
         try {
-            String newSecret = getIntent().getExtras().getString("secret");
+            String newSecret = getIntent().getExtras().getString(WuerschConfigValues.SECRET);
             LoginTaskResponse loginTaskResponse = UserService.get().getLoginURL(newSecret);
             userId = loginTaskResponse.getId();
             secret = newSecret;
@@ -42,17 +43,17 @@ public class FacebookLoginActivity extends Activity {
             webView.loadUrl(authenticationURL);
 
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + e.getMessage(), Toast.LENGTH_LONG).show();
+            ExceptionHelper.showExceptionToast(getApplicationContext(), getResources(), e);
         }
     }
 
     private void checkIfLoginWasDone(String url) {
         if (url.startsWith(WuerschURLs.getBaseUrl())) {
-            SharedPreferences sharedPreferences = getSharedPreferences(LoginScreen.PREFS_NAME, 0);
+            SharedPreferences sharedPreferences = getSharedPreferences(WuerschConfigValues.PREFS_NAME, 0);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             if (userId != null && secret != null) {
-                editor.putString("userId", userId);
-                editor.putString("secret", secret);
+                editor.putString(WuerschConfigValues.USER_ID, userId);
+                editor.putString(WuerschConfigValues.SECRET, secret);
             }
             editor.apply();
             Intent returnIntent = new Intent();

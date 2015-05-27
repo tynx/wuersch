@@ -16,12 +16,14 @@ import java.util.Date;
 
 import ch.pistachios.wuerschapp.R;
 import ch.pistachios.wuerschapp.integration.util.CryptoHelper;
+import ch.pistachios.wuerschapp.integration.util.ExceptionHelper;
+import ch.pistachios.wuerschapp.integration.util.WuerschConfigValues;
 import ch.pistachios.wuerschapp.integration_api.UserService;
 
 
 public class LoginScreen extends FragmentActivity {
 
-    public static final String PREFS_NAME = "wuersch_global_prefs";
+
     private Button loginButtonDirect;
 
     @Override
@@ -29,8 +31,8 @@ public class LoginScreen extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_screen);
 
-        SharedPreferences sharedPreferences = getSharedPreferences(LoginScreen.PREFS_NAME, 0);
-        String userId = sharedPreferences.getString("userId", null);
+        SharedPreferences sharedPreferences = getSharedPreferences(WuerschConfigValues.PREFS_NAME, 0);
+        String userId = sharedPreferences.getString(WuerschConfigValues.USER_ID, null);
 
         loginButtonDirect = (Button) findViewById(R.id.login_button_direct);
         loginButtonDirect.setEnabled(false);
@@ -39,7 +41,7 @@ public class LoginScreen extends FragmentActivity {
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), FacebookLoginActivity.class);
                 String secret = getNewSecret();
-                i.putExtra("secret", secret);
+                i.putExtra(WuerschConfigValues.SECRET, secret);
                 startActivityForResult(i, 1);
             }
         });
@@ -60,9 +62,9 @@ public class LoginScreen extends FragmentActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
-            SharedPreferences sharedPreferences = getSharedPreferences(LoginScreen.PREFS_NAME, 0);
-            String userId = sharedPreferences.getString("userId", null);
-            String secret = sharedPreferences.getString("secret", null);
+            SharedPreferences sharedPreferences = getSharedPreferences(WuerschConfigValues.PREFS_NAME, 0);
+            String userId = sharedPreferences.getString(WuerschConfigValues.USER_ID, null);
+            String secret = sharedPreferences.getString(WuerschConfigValues.SECRET, null);
 
             if (userId != null && secret != null) {
                 UserService.get().initUser(userId, secret);
@@ -72,14 +74,14 @@ public class LoginScreen extends FragmentActivity {
                 Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + getResources().getString(R.string.error_login), Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + e.getMessage(), Toast.LENGTH_LONG).show();
+            ExceptionHelper.showExceptionToast(getApplicationContext(), getResources(), e);
         }
     }
 
     private void showNoInternetDialog() {
         FragmentManager fm = getSupportFragmentManager();
         NoInternetDialog noInternetDialog = new NoInternetDialog();
-        noInternetDialog.show(fm, "fragment_no_internet");
+        noInternetDialog.show(fm, WuerschConfigValues.FRAGMENT_NO_INTERNET);
     }
 
     public boolean isDeviceOnline() {

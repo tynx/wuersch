@@ -10,19 +10,21 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import ch.pistachios.wuerschapp.R;
 import ch.pistachios.wuerschapp.integration.user.PictureTaskResponse;
+import ch.pistachios.wuerschapp.integration.util.ExceptionHelper;
+import ch.pistachios.wuerschapp.integration.util.WuerschConfigValues;
 import ch.pistachios.wuerschapp.integration_api.UserService;
 
 public class WurschActivity extends Activity {
 
     private ImageView wuerschImage;
-    private Button wuerschYes;
-    private Button wuerschNo;
+    private ImageButton wuerschYes;
+    private ImageButton wuerschNo;
     private String randomUserId;
     private String userId;
     private String secret;
@@ -33,8 +35,8 @@ public class WurschActivity extends Activity {
         setContentView(R.layout.activity_wursch);
 
         wuerschImage = (ImageView) findViewById(R.id.wuerschImage);
-        wuerschYes = (Button) findViewById(R.id.wuersch_yes);
-        wuerschNo = (Button) findViewById(R.id.wuersch_no);
+        wuerschYes = (ImageButton) findViewById(R.id.wuersch_yes);
+        wuerschNo = (ImageButton) findViewById(R.id.wuersch_no);
 
         wuerschYes.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,7 +44,7 @@ public class WurschActivity extends Activity {
                 try {
                     showNextRandomUser();
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + e.getMessage(), Toast.LENGTH_LONG).show();
+                    ExceptionHelper.showExceptionToast(getApplicationContext(), getResources(), e);
                 }
             }
         });
@@ -53,18 +55,18 @@ public class WurschActivity extends Activity {
                 try {
                     showNextRandomUser();
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + e.getMessage(), Toast.LENGTH_LONG).show();
+                    ExceptionHelper.showExceptionToast(getApplicationContext(), getResources(), e);
                 }
             }
         });
 
         try {
-            SharedPreferences sharedPreferences = getSharedPreferences(LoginScreen.PREFS_NAME, 0);
-            userId = sharedPreferences.getString("userId", null);
-            secret = sharedPreferences.getString("secret", null);
+            SharedPreferences sharedPreferences = getSharedPreferences(WuerschConfigValues.PREFS_NAME, 0);
+            userId = sharedPreferences.getString(WuerschConfigValues.USER_ID, null);
+            secret = sharedPreferences.getString(WuerschConfigValues.SECRET, null);
 
             if (!isDeviceOnline()) {
-                Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + "Gerät ist offline, bitte prüfe die Internet-Verbindung!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + getResources().getString(R.string.error_no_internet), Toast.LENGTH_LONG).show();
             } else if (userId == null) {
                 Intent i = new Intent(getApplicationContext(), LoginScreen.class);
                 startActivity(i);
@@ -72,7 +74,7 @@ public class WurschActivity extends Activity {
                 showNextRandomUser();
             }
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.error) + e.getMessage(), Toast.LENGTH_LONG).show();
+            ExceptionHelper.showExceptionToast(getApplicationContext(), getResources(), e);
         }
     }
 

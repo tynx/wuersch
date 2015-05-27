@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+    android:background="#ffffffff"
     android:orientation="vertical"
     tools:context="ch.pistachios.wuerschapp.frontend.WurschActivity">
 
@@ -14,31 +14,43 @@
          android:fitsSystemWindows. -->
 
     <ImageView
+        android:id="@+id/weursch_header"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@mipmap/ic_wuerch" />
+
+    <ImageView
         android:id="@+id/wuerschImage"
         android:layout_width="match_parent"
-        android:layout_height="450dp" />
+        android:layout_height="380dp"
+        android:background="#ffffffff" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:orientation="horizontal"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:background="#ffffffff">
 
-        <Button
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
             android:id="@+id/wuersch_yes"
-            android:layout_width="wrap_content"
-            android:layout_height="101dp"
-            android:layout_gravity="right"
-            android:layout_weight="0.35"
-            android:text="@string/yes" />
-
-        <Button
-            android:id="@+id/wuersch_no"
-            android:layout_width="wrap_content"
-            android:layout_height="101dp"
             android:layout_weight="0.33"
-            android:text="@string/no" />
+            android:src="@mipmap/ic_yes"
+            android:src="@mipmap/ic_yes"
+            android:background="@null" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:id="@+id/wuersch_no"
+            android:layout_weight="0.33"
+            android:src="@mipmap/ic_no"
+            android:background="@null" />
+
     </LinearLayout>
 
 </LinearLayout>
